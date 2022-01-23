@@ -1,6 +1,6 @@
 {
     "config_selection": "config1",
-    "path_to_khepera_code": "src/robosar_khepera_code/template",
+    "path_to_khepera_code": "/home/ros-workstation/Projects/robosar/robosar_ws/src/robosar_khepera_code/template",
     "config1": {
 
             "agent1" : {

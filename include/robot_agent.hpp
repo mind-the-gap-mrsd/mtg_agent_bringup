@@ -5,6 +5,7 @@
 
 #include <json/json.h>
 #include <string.h>
+#include <mutex>
 
 
 class RobotAgent {
@@ -12,7 +13,7 @@ class RobotAgent {
     public:
 
         ~RobotAgent() = default;
-        RobotAgent(const std::string robot_id, const std::string ip_address,const int feedback_port, const int control_port);
+        RobotAgent(const std::string robot_id, const std::string ip_address, std::string path_to_code, const int feedback_port, const int control_port);
 
         typedef enum robotStatus
         {
@@ -23,6 +24,7 @@ class RobotAgent {
 
         robotStatus_e getAgentStatus();
         
+        const std::string path_to_code_;
         const std::string robot_id_;
         const std::string ip_address_;
         const int feedback_port_;
@@ -30,6 +32,7 @@ class RobotAgent {
 
     private:
         robotStatus_e status;
+        std::mutex m;
 
 
 };

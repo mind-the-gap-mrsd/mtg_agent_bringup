@@ -19,6 +19,8 @@ class ConfigParser {
 
     private:
         static bool is_initialized_;
+
+        void configSystemInit(Json::Value config);
 };
 
 #endif
