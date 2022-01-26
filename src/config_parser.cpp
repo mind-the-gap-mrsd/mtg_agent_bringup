@@ -62,7 +62,7 @@ void ConfigParser::configSystemInit(Json::Value config) {
         agent_config = itr;
 
         // Create new Agent
-        std::shared_ptr<RobotAgent> agentPtr (new RobotAgent("agent"+it,
+        std::shared_ptr<RobotAgent> agentPtr (new RobotAgent("agent"+std::to_string(it),
                                                             agent_config["ip_address"].asString(),
                                                             path_to_khepera_code,
                                                             agent_config["feedback_port"].asInt(),

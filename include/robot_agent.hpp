@@ -1,7 +1,7 @@
 // Created by Indraneel on 22/01/21
 
-#ifndef ROBOT_AGENT_H
-#define ROBOT_AGENT_H
+#ifndef ROBOT_AGENT_HPP
+#define ROBOT_AGENT_HPP
 
 #include <json/json.h>
 #include <string.h>
@@ -19,7 +19,8 @@ class RobotAgent {
         {
             ROBOT_STATUS_ACTIVE,
             ROBOT_STATUS_INACTIVE,
-            ROBOT_STATUS_IDLE
+            ROBOT_STATUS_IDLE,
+            ROBOT_STATUS_UNREACHABLE
         } robotStatus_e;
 
         robotStatus_e getAgentStatus();

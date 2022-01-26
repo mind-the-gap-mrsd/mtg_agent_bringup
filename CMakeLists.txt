@@ -134,6 +134,7 @@ include_directories(
    ${catkin_LIBRARIES}
    ${jsoncpp_LIBRARIES}
    jsoncpp
+   -lssh
  )
 
 ## Add cmake target dependencies of the library
