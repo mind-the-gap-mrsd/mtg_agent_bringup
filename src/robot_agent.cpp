@@ -4,10 +4,13 @@
 #include "ssh_session.hpp"
 #include <ros/console.h>
 #include <memory>
+#include <ros/package.h>
 
 
-RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,std::string path_to_code,const int feedback_port, const int control_port) :
-             robot_id_(robot_id), ip_address_(ip_address), path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port) {
+RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,const std::string server_ip_addr, 
+                            const std::string path_to_code,const int feedback_port, const int control_port, const int feedback_freq) :
+             robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr), 
+             path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), feedback_freq_hz_(feedback_freq) {
 
 
     // @indraneel initialise communication
@@ -21,6 +24,14 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
         ROS_WARN("Could not reach %s",&robot_id_[0]);
         return;
     }
+
+     // Get path to config file
+    std::string package_path = ros::package::getPath("robosar_agent_bringup");
+    std::string shell = package_path + "/script/khepera_setup.sh";
+    // Run setup script
+    std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
+                         " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " +  std::to_string(feedback_freq_hz_))[0]);
+
 
 
     status = ROBOT_STATUS_ACTIVE;

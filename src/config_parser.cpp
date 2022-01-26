@@ -48,6 +48,7 @@ ConfigParser::ConfigParser() {
 void ConfigParser::configSystemInit(Json::Value config) {
 
     std::string path_to_khepera_code = config["path_to_khepera_code"].asString();
+    std::string server_ip_add = config["server_ip_address"].asString();
     // check if this file exists
     struct stat info;
     assert(stat( &path_to_khepera_code[0], &info ) == 0);
@@ -55,27 +56,31 @@ void ConfigParser::configSystemInit(Json::Value config) {
     config = config[config["config_selection"].asString()];
 
     // Iterate through all agents
-    int it = 1;
+    int it = 0;
     for(const auto& itr : config) {
 
+        it++;
         Json::Value agent_config;
         agent_config = itr;
 
         // Create new Agent
         std::shared_ptr<RobotAgent> agentPtr (new RobotAgent("agent"+std::to_string(it),
                                                             agent_config["ip_address"].asString(),
+                                                            server_ip_add,
                                                             path_to_khepera_code,
                                                             agent_config["feedback_port"].asInt(),
-                                                            agent_config["control_port"].asInt()));
+                                                            agent_config["control_port"].asInt(),
+                                                            agent_config["feedback_freq_hz"].asInt()));
         // Check if agent is alive
         if(agentPtr->getAgentStatus()==RobotAgent::ROBOT_STATUS_ACTIVE)
         {
             // Add it to vector
             agents_vec.push_back(agentPtr);
         }
-        it++;
+        //print agent status for awareness
+        ROS_INFO("%s\n",&("AGENT"+std::to_string(it)+ " :"+agentPtr->robotStatusStrVec[agentPtr->getAgentStatus()])[0]);
     }
 
-    ROS_INFO("Number of agents online : %ld\n",agents_vec.size());
+    ROS_INFO("Number of agents online : %ld/%d\n",agents_vec.size(),it);
 
 }

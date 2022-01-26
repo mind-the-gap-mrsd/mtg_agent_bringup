@@ -14,7 +14,7 @@ class SSHSession {
 
         SSHSession(const std::string ip_address)
         {
-            session.setOption(SSH_OPTIONS_HOST,"localhost");
+            session.setOption(SSH_OPTIONS_HOST,&ip_address[0]);
         }
 
         ~SSHSession() = default;
