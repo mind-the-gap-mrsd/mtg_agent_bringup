@@ -8,6 +8,10 @@ FEEDBACK_PORT=$4
 CONTROL_PORT=$5
 FEEDBACK_FREQUENCY=$6
 
+
+# Kill any old running code
+ssh root@${KHEPERA_IP_ADDRESS} pkill template
+
 # Transfer latest khepera code
 scp ${CODE_PATH} root@${KHEPERA_IP_ADDRESS}:/home/root
 
