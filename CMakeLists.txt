@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+ find_package(Boost REQUIRED COMPONENTS system)
 find_package(jsoncpp REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -133,6 +133,7 @@ include_directories(
  target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
    ${jsoncpp_LIBRARIES}
+   ${Boost_LIBRARIES}
    jsoncpp
    -lssh
  )

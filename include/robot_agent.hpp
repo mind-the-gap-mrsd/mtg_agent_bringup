@@ -6,6 +6,7 @@
 #include <json/json.h>
 #include <string.h>
 #include <mutex>
+#include <boost/asio.hpp>
 
 
 class RobotAgent {
@@ -21,6 +22,7 @@ class RobotAgent {
             ROBOT_STATUS_ACTIVE,
             ROBOT_STATUS_INACTIVE,
             ROBOT_STATUS_IDLE,
+            ROBOT_STATUS_COMM_FAIL,
             ROBOT_STATUS_UNREACHABLE
         } robotStatus_e;
 
@@ -29,6 +31,7 @@ class RobotAgent {
             "ROBOT_STATUS_ACTIVE",
             "ROBOT_STATUS_INACTIVE",
             "ROBOT_STATUS_IDLE",
+            "ROBOT_STATUS_COMM_FAIL",
             "ROBOT_STATUS_UNREACHABLE"
         };
 
@@ -45,6 +48,7 @@ class RobotAgent {
     private:
         robotStatus_e status;
         std::mutex m;
+        boost::asio::io_service io_service;
 
 
 };

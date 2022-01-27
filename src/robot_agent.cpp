@@ -5,6 +5,7 @@
 #include <ros/console.h>
 #include <memory>
 #include <ros/package.h>
+#include "async_udp_server.hpp"
 
 
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,const std::string server_ip_addr, 
@@ -32,6 +33,19 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
                          " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " +  std::to_string(feedback_freq_hz_))[0]);
 
+    // Create UDP server for feedback and control
+    try 
+    {
+        udp_server s(io_service, feedback_port_);
+
+        io_service.run();
+    }
+    catch (std::exception& e)
+    {
+        ROS_ERROR("Exception: %s\n",e.what());
+        status = ROBOT_STATUS_COMM_FAIL;
+        return;
+    }
 
 
     status = ROBOT_STATUS_ACTIVE;
