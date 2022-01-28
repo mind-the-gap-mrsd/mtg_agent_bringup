@@ -3,9 +3,9 @@
 #include <ros/ros.h>
 #include "config_parser.hpp"
 
-int main(int argc, char** argv){
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "robosar_agent_bringup_node");
-  
 
   //move_base::MoveBase move_base( buffer );
 
@@ -14,5 +14,5 @@ int main(int argc, char** argv){
   //ros::MultiThreadedSpinner s;
   ros::spin();
 
-  return(0);
+  return (0);
 }

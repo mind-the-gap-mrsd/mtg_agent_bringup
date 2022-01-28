@@ -7,20 +7,19 @@
 #include "robot_agent.hpp"
 #include <memory>
 
-class ConfigParser {
+class ConfigParser
+{
 
-    public:
+public:
+    ~ConfigParser() = default;
+    ConfigParser();
 
-        ~ConfigParser() = default;
-        ConfigParser();
+    std::vector<std::shared_ptr<RobotAgent>> agents_vec;
 
-    
-    std::vector<std::shared_ptr<RobotAgent>> agents_vec; 
+private:
+    static bool is_initialized_;
 
-    private:
-        static bool is_initialized_;
-
-        void configSystemInit(Json::Value config);
+    void configSystemInit(Json::Value config);
 };
 
 #endif

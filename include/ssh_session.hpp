@@ -3,37 +3,38 @@
 #ifndef SSH_SESSION_HPP
 #define SSH_SESSION_HPP
 
-
 #include <iostream>
 #include <string>
 #include <libssh/libsshpp.hpp>
 
-class SSHSession {
+class SSHSession
+{
 
-    public:
+public:
+    SSHSession(const std::string ip_address)
+    {
+        session.setOption(SSH_OPTIONS_HOST, &ip_address[0]);
+    }
 
-        SSHSession(const std::string ip_address)
+    ~SSHSession() = default;
+
+    bool initiateConnection()
+    {
+        try
         {
-            session.setOption(SSH_OPTIONS_HOST,&ip_address[0]);
+            session.connect();
+            session.userauthPublickeyAuto();
+            return true;
         }
-
-        ~SSHSession() = default;
-
-        bool initiateConnection()
+        catch (ssh::SshException e)
         {
-            try {
-                session.connect();
-                session.userauthPublickeyAuto();
-                return true;
-            } catch (ssh::SshException e){
 
-                return false;
-            }
+            return false;
         }
-    
+    }
 
-    private:
-        ssh::Session session;
+private:
+    ssh::Session session;
 };
 
 #endif
