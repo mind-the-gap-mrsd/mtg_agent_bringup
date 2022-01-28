@@ -12,7 +12,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
                             const std::string path_to_code,const int feedback_port, const int control_port, const int feedback_freq) :
              robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr), 
              path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port),
-              feedback_freq_hz_(feedback_freq), nh_("~"+robot_id), comm_channel_(io_service,feedback_port), work(io_service) {
+              feedback_freq_hz_(feedback_freq), nh_("~"+robot_id), comm_channel_(io_service,feedback_port,ip_address,control_port), work(io_service) {
 
 
     // @indraneel initialise communication
@@ -48,10 +48,10 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("control", 1, &RobotAgent::velocityCallback,this);
-    // @indraneel add custom message type
+    // @indraneel TODO add custom message type
     feedback_publisher_ = nh_.advertise<std_msgs::Float32>("feedback", 1, true);
 
-    // Deadman timer for heartbeat
+    //@indraneel TODO Deadman timer for heartbeat
 
 
     status = ROBOT_STATUS_ACTIVE;
@@ -71,6 +71,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist& vel_msg)
     std::string command_msg = std::to_string(vel_msg.angular.z) + "x" + std::to_string(vel_msg.linear.x);
 
     memcpy(comm_channel_.send_data_, command_msg.data(), command_msg.length());
-    comm_channel_.do_send(command_msg.length(),ip_address_,control_port_);
+    //async send
+    comm_channel_.do_send(command_msg.length());
 
 }

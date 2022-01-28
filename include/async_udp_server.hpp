@@ -21,28 +21,8 @@ using boost::asio::ip::udp;
 class udp_server
 {
 public:
-  udp_server(boost::asio::io_service& io_service, short port)
+  udp_server(boost::asio::io_service& io_service, short port,std::string remote_ip_address, int remote_port)
     : socket_(io_service, udp::endpoint(udp::v4(), port))
-  {
-    do_receive();
-  }
-
-  void do_receive()
-  {
-    socket_.async_receive_from(
-        boost::asio::buffer(receive_data_, max_length), sender_endpoint_,
-        [this](boost::system::error_code ec, std::size_t bytes_recvd)
-        {
-          if (!ec && bytes_recvd > 0)
-          {
-            //do_send(bytes_recvd);
-            // Do something with received data
-            ROS_INFO("Received some data!");
-          }
-        });
-  }
-
-  void do_send(std::size_t length, std::string remote_ip_address, int remote_port)
   {
     // Create remote endpoint
     boost::system::error_code myError;
@@ -50,19 +30,39 @@ public:
     boost::asio::ip::address IP;
     IP = boost::asio::ip::address::from_string(remote_ip_address, myError); 
 
-    udp::endpoint remote_endpoint_;
+    
     remote_endpoint_.address(IP);
     remote_endpoint_.port(remote_port);
 
+    do_receive();
 
+  }
+
+  void do_receive()
+  {
+    socket_.async_receive_from(
+        boost::asio::buffer(receive_data_, max_length), remote_endpoint_,
+        [this](boost::system::error_code ec, std::size_t bytes_recvd)
+        {
+          if (!ec && bytes_recvd > 0)
+          {
+            //do_send(bytes_recvd);
+            // Do something with received data
+            ROS_DEBUG("Received %ld bytes of data!",bytes_recvd);
+            do_receive();
+          }
+        });
+  }
+
+  void do_send(std::size_t length)
+  {
     socket_.async_send_to(
         boost::asio::buffer(send_data_, length), remote_endpoint_,
         [this](boost::system::error_code ec, std::size_t bytes_sent)
         {
-          //do_receive();
           if(!ec)
           {
-            ROS_INFO("Successfully sent %ld bytes \n",bytes_sent);
+            ROS_DEBUG("Successfully sent %ld bytes \n",bytes_sent);
           }
           else
           {
@@ -76,7 +76,7 @@ public:
   char receive_data_[max_length];
 private:
   udp::socket socket_;
-  udp::endpoint sender_endpoint_;
+  udp::endpoint remote_endpoint_;
 };
 
 #endif
