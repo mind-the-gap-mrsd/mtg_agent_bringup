@@ -18,7 +18,7 @@ class RobotAgent {
 
         ~RobotAgent() = default;
         RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
-                    const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq);
+                    const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout);
 
         typedef enum robotStatus
         {
@@ -48,6 +48,7 @@ class RobotAgent {
         const int feedback_port_;
         const int control_port_;
         const int feedback_freq_hz_;
+        const int control_timeout_ms_;
 
     private:
         robotStatus_e status;

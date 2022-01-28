@@ -9,9 +9,9 @@
 
 
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,const std::string server_ip_addr, 
-                            const std::string path_to_code,const int feedback_port, const int control_port, const int feedback_freq) :
+                            const std::string path_to_code,const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout) :
              robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr), 
-             path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port),
+             path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
               feedback_freq_hz_(feedback_freq), nh_("~"+robot_id), comm_channel_(io_service,feedback_port,ip_address,control_port), work(io_service) {
 
 
@@ -32,7 +32,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     std::string shell = package_path + "/script/khepera_setup.sh";
     // Run setup script
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
-                         " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " +  std::to_string(feedback_freq_hz_))[0]);
+                         " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " +  std::to_string(feedback_freq_hz_) + " " +  std::to_string(control_timeout_ms_))[0]);
 
     // Create io_service background thread for udp server
     try 

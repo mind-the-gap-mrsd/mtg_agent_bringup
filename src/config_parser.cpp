@@ -70,7 +70,8 @@ void ConfigParser::configSystemInit(Json::Value config) {
                                                             path_to_khepera_code,
                                                             agent_config["feedback_port"].asInt(),
                                                             agent_config["control_port"].asInt(),
-                                                            agent_config["feedback_freq_hz"].asInt()));
+                                                            agent_config["feedback_freq_hz"].asInt(),
+                                                            agent_config["control_timeout_ms"].asInt()));
         // Check if agent is alive
         if(agentPtr->getAgentStatus()==RobotAgent::ROBOT_STATUS_ACTIVE)
         {
