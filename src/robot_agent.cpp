@@ -57,6 +57,13 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     status = ROBOT_STATUS_ACTIVE;
 }
 
+/**
+ * @brief Returns agent status
+ * 
+ * @param void
+ * @return robotStatus_e
+ * 
+ */
 RobotAgent::robotStatus_e RobotAgent::getAgentStatus()
 {
 
@@ -65,6 +72,13 @@ RobotAgent::robotStatus_e RobotAgent::getAgentStatus()
     return status;
 }
 
+/**
+ * @brief Receives data from ROS and then sends it to robot using UDP
+ * 
+ * @param vel_msg twist message from ROS
+ * @return void
+ * 
+ */
 void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
 {
     ROS_DEBUG("Sending velocity v:%f w:%f to %s!\n", vel_msg.linear.x, vel_msg.angular.z, &robot_id_[0]);
