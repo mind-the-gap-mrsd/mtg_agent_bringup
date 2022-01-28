@@ -7,7 +7,10 @@
 #include <string.h>
 #include <mutex>
 #include <boost/asio.hpp>
-
+#include <ros/ros.h>
+#include <geometry_msgs/Twist.h>
+#include <std_msgs/Float32.h>
+#include "async_udp_server.hpp"
 
 class RobotAgent {
 
@@ -36,6 +39,7 @@ class RobotAgent {
         };
 
         robotStatus_e getAgentStatus();
+        void velocityCallback(const geometry_msgs::Twist& vel_msg);
         
         const std::string path_to_code_;
         const std::string robot_id_;
@@ -49,6 +53,12 @@ class RobotAgent {
         robotStatus_e status;
         std::mutex m;
         boost::asio::io_service io_service;
+        boost::asio::io_service::work work;
+        udp_server comm_channel_;
+        ros::NodeHandle nh_;
+        ros::Publisher feedback_publisher_;
+        ros::Subscriber control_subscriber_;
+        ros::Timer deadman_timer_;
 
 
 };

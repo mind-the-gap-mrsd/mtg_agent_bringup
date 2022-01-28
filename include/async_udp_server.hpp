@@ -30,7 +30,7 @@ public:
   void do_receive()
   {
     socket_.async_receive_from(
-        boost::asio::buffer(data_, max_length), sender_endpoint_,
+        boost::asio::buffer(receive_data_, max_length), sender_endpoint_,
         [this](boost::system::error_code ec, std::size_t bytes_recvd)
         {
           if (!ec && bytes_recvd > 0)
@@ -56,7 +56,7 @@ public:
 
 
     socket_.async_send_to(
-        boost::asio::buffer(data_, length), remote_endpoint_,
+        boost::asio::buffer(send_data_, length), remote_endpoint_,
         [this](boost::system::error_code ec, std::size_t bytes_sent)
         {
           //do_receive();
@@ -71,11 +71,12 @@ public:
         });
   }
 
+  enum { max_length = 1024 };
+  char send_data_[max_length];
+  char receive_data_[max_length];
 private:
   udp::socket socket_;
   udp::endpoint sender_endpoint_;
-  enum { max_length = 1024 };
-  char data_[max_length];
 };
 
 #endif
