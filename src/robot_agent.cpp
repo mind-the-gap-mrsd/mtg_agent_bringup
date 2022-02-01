@@ -6,6 +6,7 @@
 #include <memory>
 #include <ros/package.h>
 #include <boost/thread.hpp>
+#include "robosar.pb.h"
 
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout) :
