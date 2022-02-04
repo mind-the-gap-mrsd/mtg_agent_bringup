@@ -28,7 +28,8 @@ public:
     void unpack_feedback_message(robosar_fms::SensorData feedback) {
 
         ROS_INFO("Unpacking message");
-        sensor_msgs::Imu imu_msg = sensor_msgs::Imu();
+        sensor_msgs::Imu imu_msg;
+        
         imu_msg.header.frame_id = khepera_frame;
         imu_msg.header.seq = feedback.seq_id();
 
@@ -40,6 +41,7 @@ public:
         imu_msg.angular_velocity.x = angles::from_degrees(feedback.gyro_data().gyro_x());
         imu_msg.angular_velocity.y = angles::from_degrees(feedback.gyro_data().gyro_y());
         imu_msg.angular_velocity.z = angles::from_degrees(feedback.gyro_data().gyro_z());
+        
         imu_publisher_.publish(imu_msg);
 
     }

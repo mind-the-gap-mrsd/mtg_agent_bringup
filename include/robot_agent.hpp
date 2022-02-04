@@ -53,9 +53,9 @@ private:
     std::mutex m;
     boost::asio::io_service io_service;
     boost::asio::io_service::work work;
-    udp_server comm_channel_;
-    std::shared_ptr<ROSFeedbackBridge> bridgePtr;
     ros::NodeHandle nh_;
+    std::shared_ptr<ROSFeedbackBridge> bridgePtr;
+    udp_server comm_channel_;
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
 };
