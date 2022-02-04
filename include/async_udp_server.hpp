@@ -55,8 +55,10 @@ public:
             {
               ROS_ERROR("Failed to parse feedback\n");
             }
-
-            bridgePtr_->unpack_feedback_message(feedback);           
+            else
+            {
+              bridgePtr_->unpack_feedback_message(feedback);      
+            }     
 
             do_receive();
           }
