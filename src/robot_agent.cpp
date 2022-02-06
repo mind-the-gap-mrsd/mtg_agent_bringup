@@ -5,6 +5,7 @@
 #include <ros/console.h>
 #include <memory>
 #include <ros/package.h>
+#include "boost/bind.hpp"
 #include <boost/thread.hpp>
 
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
@@ -53,6 +54,8 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     feedback_publisher_ = nh_.advertise<std_msgs::Float32>("feedback", 1, true);
 
     //@indraneel TODO Deadman timer for heartbeat
+    ros::Timer timer = nh_.createTimer(ros::Duration(0.1), boost::bind(&RobotAgent::timerCallback, this, _1));
+    std::shared_ptr<ros::Timer> timer_ptr = std::make_shared<ros::Timer>(timer);
 
     status = ROBOT_STATUS_ACTIVE;
 }
@@ -88,4 +91,9 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
     memcpy(comm_channel_.send_data_, command_msg.data(), command_msg.length());
     //async send
     comm_channel_.do_send(command_msg.length());
+}
+
+
+void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
+
 }

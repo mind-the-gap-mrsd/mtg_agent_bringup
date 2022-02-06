@@ -26,7 +26,8 @@ public:
         ROBOT_STATUS_INACTIVE,
         ROBOT_STATUS_IDLE,
         ROBOT_STATUS_COMM_FAIL,
-        ROBOT_STATUS_UNREACHABLE
+        ROBOT_STATUS_UNREACHABLE,
+        ROBOT_STATUS_NO_HEARTBEAT
     } robotStatus_e;
 
     std::vector<std::string> robotStatusStrVec{
@@ -34,10 +35,12 @@ public:
         "ROBOT_STATUS_INACTIVE",
         "ROBOT_STATUS_IDLE",
         "ROBOT_STATUS_COMM_FAIL",
-        "ROBOT_STATUS_UNREACHABLE"};
+        "ROBOT_STATUS_UNREACHABLE",
+        "ROBOT_STATUS_NO_HEARTBEAT"};
 
     robotStatus_e getAgentStatus();
     void velocityCallback(const geometry_msgs::Twist &vel_msg);
+    void timerCallback(const ros::TimerEvent& timer_event);
 
     const std::string path_to_code_;
     const std::string robot_id_;
