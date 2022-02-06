@@ -15,14 +15,16 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <ros/console.h>
+#include "robosar.pb.h"
+#include "ros_feedback_bridge.hpp"
 
 using boost::asio::ip::udp;
 
 class udp_server
 {
 public:
-  udp_server(boost::asio::io_service &io_service, short port, std::string remote_ip_address, int remote_port)
-      : socket_(io_service, udp::endpoint(udp::v4(), port))
+  udp_server(boost::asio::io_service &io_service, short port, std::string remote_ip_address, int remote_port, std::shared_ptr<ROSFeedbackBridge> bridgePtr)
+      : socket_(io_service, udp::endpoint(udp::v4(), port)),bridgePtr_(bridgePtr) 
   {
     // Create remote endpoint
     boost::system::error_code myError;
@@ -45,7 +47,19 @@ public:
           {
             //do_send(bytes_recvd);
             // Do something with received data
-            ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
+            ROS_INFO("Received %ld bytes of data!", bytes_recvd);
+
+            // Unpack this data
+            robosar_fms::SensorData feedback;
+            if(!feedback.ParseFromArray(receive_data_,bytes_recvd))
+            {
+              ROS_ERROR("Failed to parse feedback\n");
+            }
+            else
+            {
+              bridgePtr_->unpack_feedback_message(feedback);      
+            }     
+
             do_receive();
           }
         });
@@ -77,6 +91,7 @@ public:
 private:
   udp::socket socket_;
   udp::endpoint remote_endpoint_;
+  std::shared_ptr<ROSFeedbackBridge> bridgePtr_;
 };
 
 #endif

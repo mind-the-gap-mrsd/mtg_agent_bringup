@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   roslib
+  robosar_messages
+  angles
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,12 +118,18 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+add_library(robosar_proto
+   src/config_parser.cpp
+   src/robot_agent.cpp
+ )
+
 include_directories(
   include
   include/robosar_agent_bringup
   ${catkin_INCLUDE_DIRS}
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
+  ${robosar_messages_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
