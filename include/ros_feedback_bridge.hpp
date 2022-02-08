@@ -10,6 +10,7 @@
 #include "robosar.pb.h"
 #include <sensor_msgs/Imu.h>
 #include <angles/angles.h>
+#include "odom_node.hpp"
 
 class ROSFeedbackBridge
 {
@@ -43,6 +44,10 @@ public:
         imu_msg.angular_velocity.z = angles::from_degrees(feedback.gyro_data().gyro_z());
         
         imu_publisher_.publish(imu_msg);
+
+        // encoder callback
+        Calc_Left(feedback.count_data().left());
+        Calc_Right(feedback.count_data().right());
 
     }
 

@@ -134,6 +134,7 @@ include_directories(
 
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
+   src/odom_node.cpp
    src/config_parser.cpp
    src/robot_agent.cpp
  )
