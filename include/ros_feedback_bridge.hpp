@@ -69,7 +69,7 @@ public:
 
     void runOdometry()
     {
-        ROS_INFO("Spinning odometry with delay %d ms",odom_delay_ms);
+        //ROS_INFO("Spinning odometry with delay %d ms",odom_delay_ms);
 
         // Set the data fields of the odometry message
         odomNew.header.frame_id = "odom";
