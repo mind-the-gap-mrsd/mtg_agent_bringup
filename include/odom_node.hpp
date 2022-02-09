@@ -1,12 +1,16 @@
 #ifndef ODOM_NODE_HPP
 #define ODOM_NODE_HPP
 
+#include "ros/ros.h"
+#include <nav_msgs/Odometry.h>
 
-// Calculate the distance the left wheel has traveled since the last cycle
-void Calc_Left(const int leftCount);
+extern int pos_left;
+extern int pos_right;
+extern nav_msgs::Odometry odomNew;
+extern nav_msgs::Odometry odomOld;
 
-// Calculate the distance the right wheel has traveled since the last cycle
-void Calc_Right(const int rightCount);
+extern void publish_quat(ros::Publisher &odom_data_pub_quat); 
 
+extern void update_odom(ros::Publisher &odom_data_pub);
 
 #endif

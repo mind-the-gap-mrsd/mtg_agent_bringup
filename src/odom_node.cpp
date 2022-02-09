@@ -2,16 +2,11 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <cmath>
-#include "ros/ros.h"
 #include "std_msgs/Int16.h"
-#include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
 
 using namespace std;
 
-// Create odometry data publishers
-ros::Publisher odom_data_pub;
-ros::Publisher odom_data_pub_quat;
 nav_msgs::Odometry odomNew;
 nav_msgs::Odometry odomOld;
  
@@ -34,22 +29,9 @@ int pos_left_prev = 0;
 int pos_right_prev = 0;
 
 
-void Calc_Left(const int leftCount) {
- 
-  pos_left = leftCount;
-  ROS_INFO("Left ticks: %d", pos_left);
-}
-
-
-void Calc_Right(const int rightCount) {
-
-  pos_right = rightCount;
-  ROS_INFO("Right ticks: %d", pos_right);
-}
-
  
 // Publish a nav_msgs::Odometry message in quaternion format
-void publish_quat() {
+void publish_quat(ros::Publisher &odom_data_pub_quat) {
  
   tf2::Quaternion q;
          
@@ -89,7 +71,7 @@ void publish_quat() {
 }
  
 // Update odometry information
-void update_odom() {
+void update_odom(ros::Publisher &odom_data_pub) {
  
     long delta_pos_left, delta_pos_right;
     float delta_left, delta_right, delta_theta, theta2;
@@ -144,47 +126,3 @@ void update_odom() {
   pos_right_prev = pos_right;
 }
  
-int main(int argc, char **argv) {
-   
-  // Set the data fields of the odometry message
-  odomNew.header.frame_id = "odom";
-  odomNew.pose.pose.position.z = 0;
-  odomNew.pose.pose.orientation.x = 0;
-  odomNew.pose.pose.orientation.y = 0;
-  odomNew.twist.twist.linear.x = 0;
-  odomNew.twist.twist.linear.y = 0;
-  odomNew.twist.twist.linear.z = 0;
-  odomNew.twist.twist.angular.x = 0;
-  odomNew.twist.twist.angular.y = 0;
-  odomNew.twist.twist.angular.z = 0;
-  odomOld.pose.pose.position.x = 0;
-  odomOld.pose.pose.position.y = 0;
-  odomOld.pose.pose.orientation.z = 0;
- 
-  // Launch ROS and create a node
-  ros::init(argc, argv, "odom_pub");
-  ros::NodeHandle node;
- 
-  // Subscribe to ROS topics
-//   ros::Subscriber subForRightCounts = node.subscribe("right_ticks", 100, Calc_Right, ros::TransportHints().tcpNoDelay());
-//   ros::Subscriber subForLeftCounts = node.subscribe("left_ticks", 100, Calc_Left, ros::TransportHints().tcpNoDelay());
- 
-  // Publisher of simple odom message where orientation.z is an euler angle
-  odom_data_pub = node.advertise<nav_msgs::Odometry>("odom_data_euler", 100);
- 
-  // Publisher of full odom message where orientation is quaternion
-  odom_data_pub_quat = node.advertise<nav_msgs::Odometry>("odom_data_quat", 100);
- 
-  ros::Rate loop_rate(30); 
-     
-  while(ros::ok()) {
-     
-    update_odom();
-    publish_quat();
-
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
- 
-  return 0;
-}
