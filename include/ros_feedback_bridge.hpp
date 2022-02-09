@@ -14,6 +14,7 @@
 #include <nav_msgs/Odometry.h>
 
 // TODO
+// Cross check variable reshuffling by neel
 // Can the odometry freq by derived from feedback frequency?
 // Put mutex locks on pos_left and pos_right
 class ROSFeedbackBridge
