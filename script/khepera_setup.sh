@@ -18,10 +18,3 @@ scp ${CODE_PATH} root@${KHEPERA_IP_ADDRESS}:/home/root
 
 # Execute latest khepera code with the right arguments
 ssh root@${KHEPERA_IP_ADDRESS} ./template ${SERVER_IP_ADDRESS} ${CONTROL_PORT} ${FEEDBACK_PORT} ${FEEDBACK_FREQUENCY} ${CONTROL_TIMEOUT} &
-
-# Get my current date
-date=$(date '+%Y-%m-%d %H:%M:%S')
-
-#disable ntp time syncronisation
-# Set date on remote computer
-ssh root@${KHEPERA_IP_ADDRESS} "timedatectl set-ntp false && timedatectl set-time '${date}'"
