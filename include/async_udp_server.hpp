@@ -47,7 +47,7 @@ public:
           {
             //do_send(bytes_recvd);
             // Do something with received data
-            ROS_INFO("Received %ld bytes of data!", bytes_recvd);
+            ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
 
             // Unpack this data
             robosar_fms::SensorData feedback;

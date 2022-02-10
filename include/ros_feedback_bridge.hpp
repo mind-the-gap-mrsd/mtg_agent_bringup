@@ -29,13 +29,14 @@ public:
 
     void unpack_feedback_message(robosar_fms::SensorData feedback) {
 
-        ROS_INFO("Unpacking message");
+        ROS_DEBUG("Unpacking message");
 
         //IMU
         sensor_msgs::Imu imu_msg;
         
         imu_msg.header.frame_id = khepera_frame;
         imu_msg.header.seq = feedback.seq_id();
+        imu_msg.header.stamp = ros::Time::now();
 
         //@indraneel convert to m/s^2
         imu_msg.linear_acceleration.x = feedback.accel_data().acc_x();
@@ -54,8 +55,8 @@ public:
         lrf_msg.header.frame_id = khepera_frame;
         lrf_msg.header.stamp = ros::Time::now();
         lrf_msg.header.seq = feedback.seq_id();
-        // @indraneel cross check this
-        lrf_msg.angle_min = -2.356194496154785;
+        // verified from URG-04LX-UG01 specification datasheet
+        lrf_msg.angle_min = -2.0923497676849365;
         lrf_msg.angle_max = 2.0923497676849365;
         lrf_msg.angle_increment = 0.006135923322290182;
         lrf_msg.time_increment = 9.765627328306437e-05;
@@ -63,7 +64,7 @@ public:
         lrf_msg.range_min = 0.019999999552965164;
         lrf_msg.range_max = 5.599999904632568;
         robosar_fms::LaserScanner lrf_feedback = feedback.lrf_data();
-        ROS_INFO("Lrf data size : %d\n",lrf_feedback.values_size());
+        //ROS_INFO("Lrf data size : %d\n",lrf_feedback.values_size());
         for(int i=0;i<lrf_feedback.values_size();i++)
         {
             // mm to metres
