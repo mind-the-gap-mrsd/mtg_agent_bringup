@@ -13,6 +13,7 @@
 #include <angles/angles.h>
 #include "odom_node.hpp"
 #include <nav_msgs/Odometry.h>
+#include <mutex>
 
 // TODO
 // Cross check variable reshuffling by neel
@@ -67,10 +68,13 @@ public:
         imu_publisher_.publish(imu_msg);
 
         // encoder callback
-        pos_left = feedback.count_data().left();
-        pos_right = feedback.count_data().right();
-        ROS_INFO("Left ticks: %d", pos_left);
-        ROS_INFO("Right ticks: %d", pos_right);
+        {
+            std::lock_guard<std::mutex> guard(mtx);
+            pos_left = feedback.count_data().left();
+            pos_right = feedback.count_data().right();
+            ROS_INFO("Left ticks: %d", pos_left);
+            ROS_INFO("Right ticks: %d", pos_right);
+        }
 
         // LaserScan
         sensor_msgs::LaserScan lrf_msg;
@@ -118,7 +122,10 @@ public:
 
         while(node_alive_)
         {
-            update_odom(odom_data_pub);
+            {
+                std::lock_guard<std::mutex> guard(mtx);
+                update_odom(odom_data_pub);
+            }
             publish_quat(odom_data_pub_quat);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(odom_delay_ms));   
@@ -137,6 +144,7 @@ private:
     bool node_alive_;
     int odom_freq_hz;
     int odom_delay_ms;
+    std::mutex mtx;
 };
 
 #endif
