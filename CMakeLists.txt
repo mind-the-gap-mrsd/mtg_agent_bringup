@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   roslib
   robosar_messages
+  robosar_tf
   angles
 )
 
@@ -125,6 +126,7 @@ include_directories(
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
   ${robosar_messages_INCLUDE_DIRS}
+  ${robosar_tf_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
