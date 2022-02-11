@@ -9,6 +9,7 @@
 #include <std_msgs/Float32.h>
 #include "robosar.pb.h"
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/LaserScan.h>
 #include <angles/angles.h>
 #include "odom_node.hpp"
 #include <nav_msgs/Odometry.h>
@@ -29,6 +30,7 @@ public:
         imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("feedback/IMU", 1, true);
         odom_data_pub = nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100);
         odom_data_pub_quat = nh_.advertise<nav_msgs::Odometry>("odom_data_quat", 100);
+        lrf_publisher_ = nh_.advertise<sensor_msgs::LaserScan>("feedback/scan", 1, true);
 
         //// Start Odom node
         odom_delay_ms = (int)((1.0/(double)(odom_freq_hz))*1000.0);
@@ -45,11 +47,14 @@ public:
 
     void unpack_feedback_message(robosar_fms::SensorData feedback) {
 
-        ROS_INFO("Unpacking message");
+        ROS_DEBUG("Unpacking message");
+
+        //IMU
         sensor_msgs::Imu imu_msg;
         
         imu_msg.header.frame_id = khepera_frame;
         imu_msg.header.seq = feedback.seq_id();
+        imu_msg.header.stamp = ros::Time::now();
 
         //@indraneel convert to m/s^2
         imu_msg.linear_acceleration.x = feedback.accel_data().acc_x();
@@ -68,6 +73,30 @@ public:
         pos_right = feedback.count_data().right();
         ROS_INFO("Left ticks: %d", pos_left);
         ROS_INFO("Right ticks: %d", pos_right);
+
+        // LaserScan
+        sensor_msgs::LaserScan lrf_msg;
+
+        lrf_msg.header.frame_id = khepera_frame;
+        lrf_msg.header.stamp = ros::Time::now();
+        lrf_msg.header.seq = feedback.seq_id();
+        // verified from URG-04LX-UG01 specification datasheet
+        lrf_msg.angle_min = -2.0923497676849365;
+        lrf_msg.angle_max = 2.0923497676849365;
+        lrf_msg.angle_increment = 0.006135923322290182;
+        lrf_msg.time_increment = 9.765627328306437e-05;
+        lrf_msg.scan_time = 0.10000000149011612;
+        lrf_msg.range_min = 0.019999999552965164;
+        lrf_msg.range_max = 5.599999904632568;
+        robosar_fms::LaserScanner lrf_feedback = feedback.lrf_data();
+        //ROS_INFO("Lrf data size : %d\n",lrf_feedback.values_size());
+        for(int i=0;i<lrf_feedback.values_size();i++)
+        {
+            // mm to metres
+            lrf_msg.ranges.push_back((float)(lrf_feedback.values(i))/1000.0f);
+        }
+
+        lrf_publisher_.publish(lrf_msg);
     }
 
     void runOdometry()
@@ -105,6 +134,7 @@ private:
     ros::Publisher imu_publisher_;
     ros::Publisher odom_data_pub;
     ros::Publisher odom_data_pub_quat;
+    ros::Publisher lrf_publisher_;
     std::string khepera_frame;
     std::thread odom_thread_;
     bool node_alive_;
