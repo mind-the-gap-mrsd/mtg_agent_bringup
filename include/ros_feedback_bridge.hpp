@@ -22,7 +22,7 @@ class ROSFeedbackBridge
 {
 
 public:
-    ROSFeedbackBridge(ros::NodeHandle nh):nh_(nh),node_alive_(true),odom_freq_hz(30),khepera_frame("base_link")
+    ROSFeedbackBridge(ros::NodeHandle nh):nh_(nh),node_alive_(true),odom_freq_hz(5),khepera_frame("base_link")
     {
 
         // Create ROS nodes for this agent

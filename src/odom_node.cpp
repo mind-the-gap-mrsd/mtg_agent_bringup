@@ -81,7 +81,7 @@ void update_odom(ros::Publisher &odom_data_pub) {
     delta_pos_right = pos_right - pos_right_prev;
     delta_left = delta_pos_left * wheel_conversion_left;
     delta_right = delta_pos_right * wheel_conversion_right;
-    delta_theta = (delta_left - delta_right) / wheel_distance;
+    delta_theta = (delta_right - delta_left) / wheel_distance;
     theta2 = odomNew.pose.pose.orientation.z + delta_theta * 0.5;
     delta_x = (delta_left + delta_right) * 0.5 * cosf(theta2);
     delta_y = (delta_left + delta_right) * 0.5 * sinf(theta2);
