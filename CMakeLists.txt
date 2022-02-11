@@ -118,11 +118,6 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-add_library(robosar_proto
-   src/config_parser.cpp
-   src/robot_agent.cpp
- )
-
 include_directories(
   include
   include/robosar_agent_bringup
