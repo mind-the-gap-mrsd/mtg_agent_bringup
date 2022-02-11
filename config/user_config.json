@@ -5,7 +5,7 @@
     "config1": {
 
             "agent1" : {
-                "ip_address" : "192.168.0.108",
+                "ip_address" : "192.168.0.110",
                 "feedback_port" : 2108,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,

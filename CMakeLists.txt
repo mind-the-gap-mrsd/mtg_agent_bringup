@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   roslib
+  robosar_messages
+  angles
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,6 +124,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
+  ${robosar_messages_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
