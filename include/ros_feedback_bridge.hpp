@@ -83,7 +83,7 @@ public:
         lrf_msg.header.stamp = ros::Time::now();
         lrf_msg.header.seq = feedback.seq_id();
         // verified from URG-04LX-UG01 specification datasheet
-        lrf_msg.angle_min = -2.0923497676849365;
+        lrf_msg.angle_min = -2.0923497676849365 + 0.006135923322290182;
         lrf_msg.angle_max = 2.0923497676849365;
         lrf_msg.angle_increment = 0.006135923322290182;
         lrf_msg.time_increment = 9.765627328306437e-05;
