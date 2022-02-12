@@ -82,7 +82,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
 {
     ROS_DEBUG("Sending velocity v:%f w:%f to %s!\n", vel_msg.linear.x, vel_msg.angular.z, &robot_id_[0]);
 
-    std::string command_msg = std::to_string(vel_msg.angular.z) + "x" + std::to_string(vel_msg.linear.x);
+    std::string command_msg = std::to_string(vel_msg.angular.z) + "x" + std::to_string(vel_msg.linear.x*1000.0);
 
     memcpy(comm_channel_.send_data_, command_msg.data(), command_msg.length());
     //async send
