@@ -17,6 +17,7 @@
 #include <ros/console.h>
 #include "robosar.pb.h"
 #include "ros_feedback_bridge.hpp"
+#include <google/protobuf/arena.h>
 
 using boost::asio::ip::udp;
 
@@ -34,7 +35,7 @@ public:
 
     remote_endpoint_.address(IP);
     remote_endpoint_.port(remote_port);
-
+    feedback = google::protobuf::Arena::CreateMessage<robosar_fms::SensorData>(&arena_local);
     do_receive();
   }
 
@@ -50,8 +51,7 @@ public:
             ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
 
             // Unpack this data
-            robosar_fms::SensorData feedback;
-            if(!feedback.ParseFromArray(receive_data_,bytes_recvd))
+            if(!feedback->ParseFromArray(receive_data_,bytes_recvd))
             {
               ROS_ERROR("Failed to parse feedback\n");
             }
@@ -92,6 +92,8 @@ private:
   udp::socket socket_;
   udp::endpoint remote_endpoint_;
   std::shared_ptr<ROSFeedbackBridge> bridgePtr_;
+  robosar_fms::SensorData* feedback;
+  google::protobuf::Arena arena_local;
 };
 
 #endif
