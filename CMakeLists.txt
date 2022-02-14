@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   roslib
+  robosar_messages
+  robosar_tf
+  angles
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,10 +125,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
+  ${robosar_messages_INCLUDE_DIRS}
+  ${robosar_tf_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
+   src/odom_node.cpp
    src/config_parser.cpp
    src/robot_agent.cpp
  )
@@ -147,6 +153,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/robosar_agent_bringup_node.cpp)
+add_executable(odom_test test/odom_test.cpp)
+
+target_link_libraries(odom_test ${PROJECT_NAME})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

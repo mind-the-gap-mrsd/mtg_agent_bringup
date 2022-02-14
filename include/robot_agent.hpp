@@ -9,8 +9,9 @@
 #include <boost/asio.hpp>
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <std_msgs/Float32.h>
 #include "async_udp_server.hpp"
+#include "ros_feedback_bridge.hpp"
+#include "odom_tf.hpp"
 
 class RobotAgent
 {
@@ -56,11 +57,12 @@ private:
     std::mutex m;
     boost::asio::io_service io_service;
     boost::asio::io_service::work work;
-    udp_server comm_channel_;
     ros::NodeHandle nh_;
-    ros::Publisher feedback_publisher_;
+    std::shared_ptr<ROSFeedbackBridge> bridgePtr;
+    udp_server comm_channel_;
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
+    odomTF odom_TF_pub;
 };
 
 #endif
