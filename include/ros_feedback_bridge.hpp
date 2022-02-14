@@ -15,15 +15,11 @@
 #include <nav_msgs/Odometry.h>
 #include <mutex>
 
-// TODO
-// Cross check variable reshuffling by neel
-// Can the odometry freq by derived from feedback frequency?
-// Put mutex locks on pos_left and pos_right
 class ROSFeedbackBridge
 {
 
 public:
-    ROSFeedbackBridge(ros::NodeHandle nh):nh_(nh),node_alive_(true),odom_freq_hz(5),khepera_frame("base_link")
+    ROSFeedbackBridge(ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame("base_link")
     {
 
         // Create ROS nodes for this agent
