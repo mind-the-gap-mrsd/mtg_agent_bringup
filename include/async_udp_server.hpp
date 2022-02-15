@@ -24,7 +24,7 @@ class udp_server
 {
 public:
   udp_server(boost::asio::io_service &io_service, short port, std::string remote_ip_address, int remote_port, std::shared_ptr<ROSFeedbackBridge> bridgePtr)
-      : socket_(io_service, udp::endpoint(udp::v4(), port)),bridgePtr_(bridgePtr) 
+      : socket_(io_service, udp::endpoint(udp::v4(), port)),bridgePtr_(bridgePtr)
   {
     // Create remote endpoint
     boost::system::error_code myError;
@@ -47,7 +47,8 @@ public:
           {
             //do_send(bytes_recvd);
             // Do something with received data
-            ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
+            ROS_INFO("Received %ld bytes of data!", bytes_recvd);
+            deadman_timer_ptr_->stop();
 
             // Unpack this data
             robosar_fms::SensorData feedback;
@@ -61,6 +62,7 @@ public:
             }     
 
             do_receive();
+            deadman_timer_ptr_->start();
           }
         });
   }
@@ -87,6 +89,7 @@ public:
   };
   char send_data_[max_length];
   char receive_data_[max_length];
+  std::shared_ptr<ros::Timer> deadman_timer_ptr_;
 
 private:
   udp::socket socket_;

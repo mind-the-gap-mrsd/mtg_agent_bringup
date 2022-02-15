@@ -1,7 +1,7 @@
 {
     "config_selection": "config1",
-    "server_ip_address": "192.168.0.103",
-    "path_to_khepera_code": "/home/jsonglaptop/catkin_ws/src/robosar_khepera_code/template",
+    "server_ip_address": "192.168.0.114",
+    "path_to_khepera_code": "/home/rachelzheng/robosar_ws/src/robosar_khepera_code/template",
     "config1": {
 
             "agent1" : {

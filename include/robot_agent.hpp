@@ -62,6 +62,7 @@ private:
     udp_server comm_channel_;
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
+    std::shared_ptr<ros::Timer> timer_ptr_;
     odomTF odom_TF_pub;
 };
 

@@ -36,6 +36,13 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     // Run setup script
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
                   " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " + std::to_string(feedback_freq_hz_) + " " + std::to_string(control_timeout_ms_))[0]);
+    
+    //@indraneel TODO Deadman timer for heartbeat
+    deadman_timer_ = nh_.createTimer(ros::Duration(1.0), boost::bind(&RobotAgent::timerCallback, this, _1));
+    deadman_timer_.stop();
+    timer_ptr_ = std::make_shared<ros::Timer>(deadman_timer_);
+    comm_channel_.deadman_timer_ptr_  = timer_ptr_;
+
 
     // Create io_service background thread for udp server
     try
@@ -52,10 +59,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("control", 1, &RobotAgent::velocityCallback, this);
 
-    //@indraneel TODO Deadman timer for heartbeat
-    ros::Timer timer = nh_.createTimer(ros::Duration(0.1), boost::bind(&RobotAgent::timerCallback, this, _1));
-    std::shared_ptr<ros::Timer> timer_ptr = std::make_shared<ros::Timer>(timer);
-
+    
     status = ROBOT_STATUS_ACTIVE;
 }
 
@@ -94,5 +98,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
 
 
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
-
+    status = ROBOT_STATUS_NO_HEARTBEAT;
+    ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
+    timer_ptr_->stop();
 }
