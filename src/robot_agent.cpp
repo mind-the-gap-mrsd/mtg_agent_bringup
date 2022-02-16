@@ -73,7 +73,6 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     // default logger uses default configurations
     el::Loggers::reconfigureLogger(robot_id_, agentLogConf);
 
-    LOG(INFO) << "Log using default file";
     logger->info("All hail lord gupta");
 
     status = ROBOT_STATUS_ACTIVE;
