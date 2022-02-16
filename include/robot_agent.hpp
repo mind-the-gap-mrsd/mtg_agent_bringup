@@ -12,12 +12,12 @@
 #include "async_udp_server.hpp"
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
-
+#include "easylogging++.h"
 class RobotAgent
 {
 
 public:
-    ~RobotAgent() = default;
+    ~RobotAgent();
     RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout);
 
@@ -60,6 +60,7 @@ private:
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
     odomTF odom_TF_pub;
+    el::Logger* logger; 
 };
 
 #endif

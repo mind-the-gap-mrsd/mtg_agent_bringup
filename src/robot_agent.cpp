@@ -6,6 +6,7 @@
 #include <memory>
 #include <ros/package.h>
 #include <boost/thread.hpp>
+#include "easylogging++.h"
 
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout) :
@@ -53,7 +54,33 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 
     //@indraneel TODO Deadman timer for heartbeat
 
+
+    // Create log file for this agent
+    el::Configurations agentLogConf;
+    agentLogConf.setToDefault();
+    // Values are always std::string
+    
+    agentLogConf.set(el::Level::Info,
+            el::ConfigurationType::Format, "%datetime %level %msg");
+    agentLogConf.set(el::Level::Info,
+            el::ConfigurationType::ToFile,"true");
+    agentLogConf.set(el::Level::Info,
+            el::ConfigurationType::ToStandardOutput,"false");
+    agentLogConf.set(el::Level::Info,
+            el::ConfigurationType::Filename,package_path+"/logs/"+robot_id_);
+    // Create new logger
+    logger = el::Loggers::getLogger(robot_id_);
+    // default logger uses default configurations
+    el::Loggers::reconfigureLogger(robot_id_, agentLogConf);
+
+    LOG(INFO) << "Log using default file";
+    logger->info("All hail lord gupta");
+
     status = ROBOT_STATUS_ACTIVE;
+}
+
+RobotAgent::~RobotAgent() {
+    el::Loggers::unregisterLogger(robot_id_);
 }
 
 /**

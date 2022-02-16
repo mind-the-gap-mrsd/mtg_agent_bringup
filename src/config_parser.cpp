@@ -8,8 +8,10 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "easylogging++.h"
 
 bool ConfigParser::is_initialized_ = false;
+INITIALIZE_EASYLOGGINGPP
 
 ConfigParser::ConfigParser()
 {
