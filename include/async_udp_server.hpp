@@ -17,6 +17,7 @@
 #include <ros/console.h>
 #include "robosar.pb.h"
 #include "ros_feedback_bridge.hpp"
+#include "robot_status.hpp"
 
 using boost::asio::ip::udp;
 
@@ -49,6 +50,10 @@ public:
             // Do something with received data
             ROS_INFO("Received %ld bytes of data!", bytes_recvd);
             deadman_timer_ptr_->stop();
+            if (status_ptr_->getAgentStatus() != RobotStatus::ROBOT_STATUS_ACTIVE) {
+              status_ptr_->setAgentStatus(RobotStatus::ROBOT_STATUS_ACTIVE);
+              ROS_INFO("ACTIVE");
+            }
 
             // Unpack this data
             robosar_fms::SensorData feedback;
@@ -90,6 +95,7 @@ public:
   char send_data_[max_length];
   char receive_data_[max_length];
   std::shared_ptr<ros::Timer> deadman_timer_ptr_;
+  std::shared_ptr<RobotStatus> status_ptr_;
 
 private:
   udp::socket socket_;

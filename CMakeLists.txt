@@ -134,6 +134,7 @@ include_directories(
    src/odom_node.cpp
    src/config_parser.cpp
    src/robot_agent.cpp
+   src/robot_status.cpp
  )
 
  target_link_libraries(${PROJECT_NAME}

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "robot_status.hpp"
 
 bool ConfigParser::is_initialized_ = false;
 
@@ -77,7 +78,7 @@ void ConfigParser::configSystemInit(Json::Value config)
                                                             agent_config["feedback_freq_hz"].asInt(),
                                                             agent_config["control_timeout_ms"].asInt()));
         // Check if agent is alive
-        if (agentPtr->getAgentStatus() == RobotAgent::ROBOT_STATUS_ACTIVE)
+        if (agentPtr->getAgentStatus() == RobotStatus::ROBOT_STATUS_ACTIVE)
         {
             // Add it to vector
             agents_vec.push_back(agentPtr);

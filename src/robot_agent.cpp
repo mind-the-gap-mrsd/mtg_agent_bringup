@@ -14,18 +14,17 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
                                                                                                                                                               robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr),bridgePtr(std::make_shared<ROSFeedbackBridge>(nh_,feedback_freq)),
 
                                                                                                                                                               path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
-                                                                                                                                                              feedback_freq_hz_(feedback_freq), nh_("~" + robot_id), comm_channel_(io_service, feedback_port, ip_address, control_port,bridgePtr), work(io_service),
+                                                                                                                                                              feedback_freq_hz_(feedback_freq), nh_("~" + robot_id), comm_channel_(io_service, feedback_port, ip_address, control_port, bridgePtr), work(io_service),
                                                                                                                                                               odom_TF_pub(nh_)
 {
 
     // @indraneel initialise communication
-    std::lock_guard<std::mutex> guard(m);
 
     // Set up khepera robot
     std::shared_ptr<SSHSession> sessionPtr(new SSHSession(ip_address_));
     if (!sessionPtr->initiateConnection())
     {
-        status = ROBOT_STATUS_UNREACHABLE;
+        agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_UNREACHABLE);
         ROS_WARN("Could not reach %s", &robot_id_[0]);
         return;
     }
@@ -52,31 +51,30 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     catch (std::exception &e)
     {
         ROS_ERROR("Exception: %s\n", e.what());
-        status = ROBOT_STATUS_COMM_FAIL;
+        agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
         return;
     }
 
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("control", 1, &RobotAgent::velocityCallback, this);
 
-    
-    status = ROBOT_STATUS_ACTIVE;
+    status_ptr_ = std::make_shared<RobotStatus>(agent_status_);
+    comm_channel_.status_ptr_ = status_ptr_;
 }
+
 
 /**
  * @brief Returns agent status
  * 
  * @param void
- * @return robotStatus_e
+ * @return status_e
  * 
  */
-RobotAgent::robotStatus_e RobotAgent::getAgentStatus()
+RobotStatus::status_e RobotAgent::getAgentStatus()
 {
-
-    // @indraneel add mutex lock
-    std::lock_guard<std::mutex> guard(m);
-    return status;
+    return agent_status_.getAgentStatus();
 }
+
 
 /**
  * @brief Receives data from ROS and then sends it to robot using UDP
@@ -98,7 +96,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
 
 
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
-    status = ROBOT_STATUS_NO_HEARTBEAT;
+    agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
     ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }
