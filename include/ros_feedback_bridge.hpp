@@ -67,7 +67,7 @@ public:
         ROS_INFO("Killing feedback bridge");
         node_alive_ = false;
         odom_thread_.join();
-        el::Loggers::unregisterLogger(robot_id_);
+        el::Loggers::unregisterLogger(rid);
     }
 
     void unpack_feedback_message(robosar_fms::SensorData feedback) {
