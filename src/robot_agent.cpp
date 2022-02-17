@@ -24,7 +24,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     std::shared_ptr<SSHSession> sessionPtr(new SSHSession(ip_address_));
     if (!sessionPtr->initiateConnection())
     {
-        agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_UNREACHABLE);
+        agent_status_.setStatus(RobotStatus::ROBOT_STATUS_UNREACHABLE);
         ROS_WARN("Could not reach %s", &robot_id_[0]);
         return;
     }
@@ -51,7 +51,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     catch (std::exception &e)
     {
         ROS_ERROR("Exception: %s\n", e.what());
-        agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
+        agent_status_.setStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
         return;
     }
 
@@ -72,7 +72,11 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
  */
 RobotStatus::status_e RobotAgent::getAgentStatus()
 {
-    return agent_status_.getAgentStatus();
+    return agent_status_.getStatus();
+}
+
+std::string RobotAgent::getAgentStatusString() {
+    return agent_status_.robotStatusStrVec[agent_status_.getStatus()];
 }
 
 
@@ -96,7 +100,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
 
 
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
-    agent_status_.setAgentStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
+    agent_status_.setStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
     ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }

@@ -84,7 +84,7 @@ void ConfigParser::configSystemInit(Json::Value config)
             agents_vec.push_back(agentPtr);
         }
         //print agent status for awareness
-        ROS_INFO("%s\n", &("AGENT" + std::to_string(it) + " :" + agentPtr->robotStatusStrVec[agentPtr->getAgentStatus()])[0]);
+        ROS_INFO("%s\n", &("AGENT" + std::to_string(it) + " :" + agentPtr->getAgentStatusString())[0]);
     }
 
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
