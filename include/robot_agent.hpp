@@ -12,7 +12,6 @@
 #include "async_udp_server.hpp"
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
-#include "easylogging++.h"
 class RobotAgent
 {
 
@@ -60,7 +59,6 @@ private:
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
     odomTF odom_TF_pub;
-    el::Logger* logger; 
 };
 
 #endif
