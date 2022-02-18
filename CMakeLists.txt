@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
  find_package(Boost REQUIRED COMPONENTS system)
 find_package(jsoncpp REQUIRED)
+find_package(Protobuf REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -126,6 +127,7 @@ include_directories(
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
   ${robosar_messages_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
   ${robosar_tf_INCLUDE_DIRS}
   third_party/easyloggingpp/src
 )
@@ -149,6 +151,7 @@ add_library(easy_logging
    ${Boost_LIBRARIES}
    jsoncpp
    -lssh
+   ${PROTOBUF_LIBRARY}
    easy_logging
  )
 
