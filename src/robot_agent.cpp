@@ -11,7 +11,7 @@
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout) :
 
-                                                                                                                                                              robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr),bridgePtr(std::make_shared<ROSFeedbackBridge>(nh_,feedback_freq)),
+                                                                                                                                                              robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr),bridgePtr(std::make_shared<ROSFeedbackBridge>(robot_id,nh_,feedback_freq)),
 
                                                                                                                                                               path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
                                                                                                                                                               feedback_freq_hz_(feedback_freq), nh_("~" + robot_id), comm_channel_(io_service, feedback_port, ip_address, control_port, bridgePtr), work(io_service),

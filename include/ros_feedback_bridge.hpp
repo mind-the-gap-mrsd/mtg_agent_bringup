@@ -14,12 +14,14 @@
 #include "odom_node.hpp"
 #include <nav_msgs/Odometry.h>
 #include <mutex>
+#include "easylogging++.h"
+#include <ros/package.h>
 
 class ROSFeedbackBridge
 {
 
 public:
-    ROSFeedbackBridge(ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame("base_link")
+    ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame("base_link"),rid(robot_id_)
     {
 
         // Create ROS nodes for this agent
@@ -31,6 +33,32 @@ public:
         //// Start Odom node
         odom_delay_ms = (int)((1.0/(double)(odom_freq_hz))*1000.0);
         odom_thread_ = std::thread(&ROSFeedbackBridge::runOdometry, this);
+
+        std::string package_path = ros::package::getPath("robosar_agent_bringup");
+
+        // Create log file for this agent
+        el::Configurations agentLogConf;
+        agentLogConf.setToDefault();
+        // Values are always std::string
+        
+        agentLogConf.set(el::Level::Info,
+                el::ConfigurationType::Format, "%datetime %level %msg");
+        agentLogConf.set(el::Level::Info,
+                el::ConfigurationType::ToFile,"true");
+        agentLogConf.set(el::Level::Info,
+                el::ConfigurationType::ToStandardOutput,"false");
+        agentLogConf.set(el::Level::Info,
+                el::ConfigurationType::Filename,package_path+"/logs/"+robot_id_+".txt");
+        agentLogConf.set(el::Level::Info,
+                el::ConfigurationType::MaxLogFileSize,"1000000");
+        // Create new logger
+        logger = el::Loggers::getLogger(robot_id_);
+        // default logger uses default configurations
+        el::Loggers::reconfigureLogger(robot_id_, agentLogConf);
+
+        logger->info("*************************************************************************");
+        logger->info("All hail lord gupta");
+        logger->info("*************************************************************************");
         
     }
 
@@ -39,6 +67,7 @@ public:
         ROS_INFO("Killing feedback bridge");
         node_alive_ = false;
         odom_thread_.join();
+        el::Loggers::unregisterLogger(rid);
     }
 
     void unpack_feedback_message(robosar_fms::SensorData feedback) {
@@ -63,12 +92,21 @@ public:
         
         imu_publisher_.publish(imu_msg);
 
+        logger->info("IMU seq :%v, accel_x :%v, accel_y :%v, accel_z :%v, ang_x :%v,  ang_y :%v,  ang_z :%v",imu_msg.header.seq,
+                                                                                                            imu_msg.linear_acceleration.x,
+                                                                                                            imu_msg.linear_acceleration.y,
+                                                                                                            imu_msg.linear_acceleration.z,
+                                                                                                            imu_msg.angular_velocity.x,
+                                                                                                            imu_msg.angular_velocity.y,
+                                                                                                            imu_msg.angular_velocity.z);
         // encoder callback
         {
             std::lock_guard<std::mutex> guard(mtx);
             pos_left = feedback.count_data().left();
             pos_right = feedback.count_data().right();
         }
+        logger->info("Left ticks: %v", pos_left);
+        logger->info("Right ticks: %v", pos_right);
 
         // LaserScan
         sensor_msgs::LaserScan lrf_msg;
@@ -139,6 +177,8 @@ private:
     int odom_freq_hz;
     int odom_delay_ms;
     std::mutex mtx;
+    el::Logger* logger; 
+    std::string rid;
 };
 
 #endif
