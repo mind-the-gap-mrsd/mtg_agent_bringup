@@ -68,8 +68,6 @@ public:
             std::lock_guard<std::mutex> guard(mtx);
             pos_left = feedback.count_data().left();
             pos_right = feedback.count_data().right();
-            ROS_INFO("Left ticks: %d", pos_left);
-            ROS_INFO("Right ticks: %d", pos_right);
         }
 
         // LaserScan

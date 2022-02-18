@@ -45,16 +45,15 @@ public:
     socket_.async_receive_from(
         boost::asio::buffer(receive_data_, max_length), remote_endpoint_,
         [this](boost::system::error_code ec, std::size_t bytes_recvd) {
-          ROS_INFO("%s\n", &("AGENT :" + status_ptr_->robotStatusStrVec[status_ptr_->getStatus()])[0]);
+          ROS_DEBUG("%s\n", &("AGENT: " + status_ptr_->robotStatusStrVec[status_ptr_->getStatus()])[0]);
           if (!ec && bytes_recvd > 0)
           {
             //do_send(bytes_recvd);
             // Do something with received data
-            ROS_INFO("Received %ld bytes of data!", bytes_recvd);
+            ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
             deadman_timer_ptr_->stop();
             if (status_ptr_->getStatus() != RobotStatus::ROBOT_STATUS_ACTIVE) {
               status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_ACTIVE);
-              ROS_INFO("ACTIVE");
             }
 
             // Unpack this data
