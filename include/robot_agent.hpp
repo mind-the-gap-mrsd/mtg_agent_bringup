@@ -11,7 +11,7 @@
 #include <geometry_msgs/Twist.h>
 #include "async_udp_server.hpp"
 #include "ros_feedback_bridge.hpp"
-
+#include "odom_tf.hpp"
 class RobotAgent
 {
 
@@ -58,6 +58,7 @@ private:
     udp_server comm_channel_;
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
+    odomTF odom_TF_pub;
 };
 
 #endif

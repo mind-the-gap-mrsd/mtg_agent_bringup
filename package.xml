@@ -56,6 +56,7 @@
   <build_depend>roslib</build_depend>
   <build_depend>angles</build_depend>
   <build_depend>robosar_messages</build_depend>
+  <build_depend>robosar_tf</build_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>

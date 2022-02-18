@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   roslib
   robosar_messages
+  robosar_tf
   angles
 )
 
@@ -126,11 +127,20 @@ include_directories(
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
   ${robosar_messages_INCLUDE_DIRS}
-  include_directories(${PROTOBUF_INCLUDE_DIR})
+  ${PROTOBUF_INCLUDE_DIR}
+  ${robosar_tf_INCLUDE_DIRS}
+  third_party/easyloggingpp/src
+)
+
+add_definitions(-DELPP_THREAD_SAFE) 
+## Declare a C++ library
+add_library(easy_logging
+  third_party/easyloggingpp/src/easylogging++.cc
 )
 
 ## Declare a C++ library
  add_library(${PROJECT_NAME}
+   src/odom_node.cpp
    src/config_parser.cpp
    src/robot_agent.cpp
  )
@@ -142,6 +152,7 @@ include_directories(
    jsoncpp
    -lssh
    ${PROTOBUF_LIBRARY}
+   easy_logging
  )
 
 ## Add cmake target dependencies of the library
@@ -153,6 +164,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/robosar_agent_bringup_node.cpp)
+add_executable(odom_test test/odom_test.cpp)
+
+target_link_libraries(odom_test ${PROJECT_NAME})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
