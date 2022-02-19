@@ -12,7 +12,6 @@
 #include "async_udp_server.hpp"
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
-
 class RobotAgent
 {
 
