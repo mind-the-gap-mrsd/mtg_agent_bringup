@@ -5,7 +5,6 @@
 
 #include <json/json.h>
 #include <string.h>
-#include <mutex>
 #include <boost/asio.hpp>
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>

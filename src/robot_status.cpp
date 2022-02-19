@@ -1,7 +1,10 @@
 #include "robot_status.hpp"
 
+std::atomic<RobotStatus::status_e> status_(RobotStatus::ROBOT_STATUS_ACTIVE);
+
 RobotStatus::RobotStatus() {
-    status_ = ROBOT_STATUS_ACTIVE;
+    //status_ = ROBOT_STATUS_ACTIVE;
+    
 }
 
 

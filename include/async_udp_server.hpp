@@ -26,8 +26,8 @@ using boost::asio::ip::udp;
 class udp_server
 {
 public:
-  udp_server(boost::asio::io_service &io_service, short port, std::string remote_ip_address, int remote_port, std::shared_ptr<ROSFeedbackBridge> bridgePtr)
-      : socket_(io_service, udp::endpoint(udp::v4(), port)),bridgePtr_(bridgePtr)
+  udp_server(std::string rid, boost::asio::io_service &io_service, short port, std::string remote_ip_address, int remote_port, std::shared_ptr<ROSFeedbackBridge> bridgePtr)
+      : socket_(io_service, udp::endpoint(udp::v4(), port)),bridgePtr_(bridgePtr),rid_(rid)
   {
     // Create remote endpoint
     boost::system::error_code myError;
@@ -55,6 +55,7 @@ public:
             deadman_timer_ptr_->stop();
             if (status_ptr_->getStatus() != RobotStatus::ROBOT_STATUS_ACTIVE) {
               status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_ACTIVE);
+              ROS_WARN("%s: STATUS ACTIVE", &rid_[0]);
             }
 
             // Unpack this data
@@ -104,6 +105,7 @@ private:
   std::shared_ptr<ROSFeedbackBridge> bridgePtr_;
   robosar_fms::SensorData* feedback;
   google::protobuf::Arena arena_local;
+  std::string rid_;
 };
 
 #endif

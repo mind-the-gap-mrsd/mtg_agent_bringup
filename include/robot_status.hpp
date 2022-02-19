@@ -15,6 +15,8 @@ class RobotStatus {
 
 public:
 
+    RobotStatus();
+    ~RobotStatus() = default;
     typedef enum Status
     {
         ROBOT_STATUS_ACTIVE,
@@ -32,16 +34,9 @@ public:
         "ROBOT_STATUS_COMM_FAIL",
         "ROBOT_STATUS_UNREACHABLE",
         "ROBOT_STATUS_NO_HEARTBEAT"};
-    
-    ~RobotStatus(){};
-    RobotStatus();
-    
 
     status_e getStatus();
     void setStatus(status_e new_status);
-
-private:
-    status_e status_;
 
 };
 
