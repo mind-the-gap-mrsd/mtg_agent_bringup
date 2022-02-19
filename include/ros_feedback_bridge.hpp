@@ -102,8 +102,8 @@ public:
         // encoder callback
         {
             std::lock_guard<std::mutex> guard(mtx);
-            pos_left = feedback.count_data().left();
-            pos_right = feedback.count_data().right();
+            pos_left = feedback->count_data().left();
+            pos_right = feedback->count_data().right();
         }
         logger->info("Left ticks: %v", pos_left);
         logger->info("Right ticks: %v", pos_right);

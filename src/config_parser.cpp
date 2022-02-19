@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "robot_status.hpp"
 #include "easylogging++.h"
 
 bool ConfigParser::is_initialized_ = false;
@@ -79,13 +80,13 @@ void ConfigParser::configSystemInit(Json::Value config)
                                                             agent_config["feedback_freq_hz"].asInt(),
                                                             agent_config["control_timeout_ms"].asInt()));
         // Check if agent is alive
-        if (agentPtr->getAgentStatus() == RobotAgent::ROBOT_STATUS_ACTIVE)
+        if (agentPtr->getAgentStatus() == RobotStatus::ROBOT_STATUS_ACTIVE)
         {
             // Add it to vector
             agents_vec.push_back(agentPtr);
         }
         //print agent status for awareness
-        ROS_INFO("%s\n", &("AGENT" + std::to_string(it) + " :" + agentPtr->robotStatusStrVec[agentPtr->getAgentStatus()])[0]);
+        ROS_INFO("%s\n", &("AGENT" + std::to_string(it) + " :" + agentPtr->getAgentStatusString())[0]);
     }
 
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
