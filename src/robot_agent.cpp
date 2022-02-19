@@ -63,18 +63,18 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 }
 
 RobotAgent::~RobotAgent() {
-    // Check if robot is reachable
     std::cout<<"Killing :"<<&robot_id_[0]<<std::endl;
-    std::shared_ptr<SSHSession> sessionPtr(new SSHSession(ip_address_));
-    if (!sessionPtr->initiateConnection())
-    {
-        std::cout<<"Could not cleanly kill"<<&robot_id_[0]<<std::endl;
-    }
-    else
+    
+    // Check if robot is reachable
+    if(getAgentStatus()!=RobotStatus::ROBOT_STATUS_NO_HEARTBEAT)
     {
         // Cleanly exit the agent side software
         std::string shell = package_path + "/script/khepera_setdown.sh";
         std::system(&(shell + " " + ip_address_)[0]);
+    }
+    else
+    {
+        std::cout<<"Could not kill agent cleanly!"<<std::endl;
     }
     io_service.stop();
 }
