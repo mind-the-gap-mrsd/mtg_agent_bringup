@@ -17,7 +17,7 @@ class RobotAgent
 {
 
 public:
-    ~RobotAgent() = default;
+    ~RobotAgent();
     RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout);
 
@@ -45,6 +45,7 @@ private:
     ros::Timer deadman_timer_;
     std::shared_ptr<ros::Timer> timer_ptr_;
     odomTF odom_TF_pub;
+    std::string package_path;
     RobotStatus agent_status_;
     std::shared_ptr<RobotStatus> status_ptr_;
 };

@@ -30,7 +30,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     }
 
     // Get path to config file
-    std::string package_path = ros::package::getPath("robosar_agent_bringup");
+    package_path = ros::package::getPath("robosar_agent_bringup");
     std::string shell = package_path + "/script/khepera_setup.sh";
     // Run setup script
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
@@ -62,6 +62,22 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     comm_channel_.status_ptr_ = status_ptr_;
 }
 
+RobotAgent::~RobotAgent() {
+    std::cout<<"Killing :"<<&robot_id_[0]<<std::endl;
+    
+    // Check if robot is reachable
+    if(getAgentStatus()!=RobotStatus::ROBOT_STATUS_NO_HEARTBEAT)
+    {
+        // Cleanly exit the agent side software
+        std::string shell = package_path + "/script/khepera_setdown.sh";
+        std::system(&(shell + " " + ip_address_)[0]);
+    }
+    else
+    {
+        std::cout<<"Could not kill agent cleanly!"<<std::endl;
+    }
+    io_service.stop();
+}
 
 /**
  * @brief Returns agent status
