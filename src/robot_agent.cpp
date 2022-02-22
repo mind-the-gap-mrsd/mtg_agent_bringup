@@ -66,7 +66,9 @@ RobotAgent::~RobotAgent() {
     std::cout<<"Killing :"<<&robot_id_[0]<<std::endl;
     
     // Check if robot is reachable
-    if(getAgentStatus()!=RobotStatus::ROBOT_STATUS_NO_HEARTBEAT)
+    RobotStatus::status_e myCurStatus = getAgentStatus();
+    if(myCurStatus!=RobotStatus::ROBOT_STATUS_NO_HEARTBEAT &&
+        myCurStatus!=RobotStatus::ROBOT_STATUS_UNREACHABLE)
     {
         // Cleanly exit the agent side software
         std::string shell = package_path + "/script/khepera_setdown.sh";
