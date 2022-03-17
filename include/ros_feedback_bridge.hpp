@@ -21,7 +21,7 @@ class ROSFeedbackBridge
 {
 
 public:
-    ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame("base_link"),rid(robot_id_)
+    ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame(robot_id_+"/base_link"),rid(robot_id_)
     {
 
         // Create ROS nodes for this agent
