@@ -21,13 +21,14 @@ class ROSFeedbackBridge
 {
 
 public:
-    ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame(robot_id_+"/base_link"),rid(robot_id_)
+    ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):
+        nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame(robot_id_+"/base_link"),rid(robot_id_),
+        odom_data_pub_euler(nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100)),odom_data_pub_quat(nh_.advertise<nav_msgs::Odometry>("odom_data_quat", 100)),
+        odom_node_(odom_data_pub_euler, odom_data_pub_quat)
     {
 
         // Create ROS nodes for this agent
         imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("feedback/IMU", 1, true);
-        odom_data_pub = nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100);
-        odom_data_pub_quat = nh_.advertise<nav_msgs::Odometry>("odom_data_quat", 100);
         lrf_publisher_ = nh_.advertise<sensor_msgs::LaserScan>("feedback/scan", 1, true);
 
         //// Start Odom node
@@ -100,10 +101,12 @@ public:
                                                                                                             imu_msg.angular_velocity.y,
                                                                                                             imu_msg.angular_velocity.z);
         // encoder callback
+        int pos_left, pos_right;
         {
             std::lock_guard<std::mutex> guard(mtx);
             pos_left = feedback->count_data().left();
             pos_right = feedback->count_data().right();
+            odom_node_.update_encoders(pos_left, pos_right);
         }
         logger->info("Left ticks: %v", pos_left);
         logger->info("Right ticks: %v", pos_right);
@@ -136,30 +139,16 @@ public:
     void runOdometry()
     {
         //ROS_INFO("Spinning odometry with delay %d ms",odom_delay_ms);
-
-        // Set the data fields of the odometry message
-        odomNew.header.frame_id = "odom";
-        odomNew.pose.pose.position.z = 0;
-        odomNew.pose.pose.orientation.x = 0;
-        odomNew.pose.pose.orientation.y = 0;
-        odomNew.twist.twist.linear.x = 0;
-        odomNew.twist.twist.linear.y = 0;
-        odomNew.twist.twist.linear.z = 0;
-        odomNew.twist.twist.angular.x = 0;
-        odomNew.twist.twist.angular.y = 0;
-        odomNew.twist.twist.angular.z = 0;
-        odomOld.pose.pose.position.x = 0;
-        odomOld.pose.pose.position.y = 0;
-        odomOld.pose.pose.orientation.z = 0;
-
         while(node_alive_)
         {
             {
                 std::lock_guard<std::mutex> guard(mtx);
-                update_odom(odom_data_pub);
+                // Update odometry messages
+                odom_node_.update_odom();
             }
-            publish_quat(odom_data_pub_quat);
-
+            // Publish odometry messages
+            odom_node_.publish_euler();
+            odom_node_.publish_quat();
             std::this_thread::sleep_for(std::chrono::milliseconds(odom_delay_ms));   
         }
     }
@@ -168,7 +157,7 @@ public:
 private:
     ros::NodeHandle nh_;
     ros::Publisher imu_publisher_;
-    ros::Publisher odom_data_pub;
+    ros::Publisher odom_data_pub_euler;
     ros::Publisher odom_data_pub_quat;
     ros::Publisher lrf_publisher_;
     std::string khepera_frame;
@@ -179,6 +168,7 @@ private:
     std::mutex mtx;
     el::Logger* logger; 
     std::string rid;
+    OdomNode odom_node_;
 };
 
 #endif

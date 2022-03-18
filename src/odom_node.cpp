@@ -7,53 +7,124 @@
 
 using namespace std;
 
-nav_msgs::Odometry odomNew;
-nav_msgs::Odometry odomOld;
-#define SizeOfCovarianceMatrix 36
+// Constructor
+OdomNode::OdomNode(ros::Publisher odom_data_pub_euler, ros::Publisher odom_data_pub_quat):
+  odom_data_pub_euler_(odom_data_pub_euler),
+  odom_data_pub_quat_(odom_data_pub_quat)
+{
+  // Initialize odomNew_
+  odomNew_.header.frame_id = "odom";
+  odomNew_.child_frame_id = "base_link";
+  odomNew_.pose.pose.position.z = 0;
+  odomNew_.pose.pose.orientation.x = 0;
+  odomNew_.pose.pose.orientation.y = 0;
+  odomNew_.twist.twist.linear.x = 0;
+  odomNew_.twist.twist.linear.y = 0;
+  odomNew_.twist.twist.linear.z = 0;
+  odomNew_.twist.twist.angular.x = 0;
+  odomNew_.twist.twist.angular.y = 0;
+  odomNew_.twist.twist.angular.z = 0;
+  // Initialize odomOld_
+  odomOld_.pose.pose.position.x = 0;
+  odomOld_.pose.pose.position.y = 0;
+  odomOld_.pose.pose.orientation.z = 0;
+}
 
-// Initial pose
-const double initialX = 0.0;
-const double initialY = 0.0;
-const double initialTheta = 0.00000000001;
-const double PI = 3.141592;
+// Update encoder values
+void OdomNode::update_encoders(int enc_left, int enc_right){
+  pos_left_ = enc_left;
+  pos_right_ = enc_right;
+}
 
-// Robot physical constants
-const double TICKS_PER_REVOLUTION = 19456;              // For reference purposes.
-const double wheel_distance = 0.10470;                  // Center of left tire to center of right tire
-const double wheel_conversion_left = 0.13194 / 19456.0; // perimeter over pulses per rev
-const double wheel_conversion_right = 0.13194 / 19456.0;
+// Update odomNew, odomOld
+void OdomNode::update_odom()
+{
 
-// Encoder value
-int pos_left = 0;
-int pos_right = 0;
-int pos_left_prev = 0;
-int pos_right_prev = 0;
+  long delta_pos_left, delta_pos_right;
+  float delta_left, delta_right, delta_theta, theta2;
+  float delta_x, delta_y;
 
-// Publish a nav_msgs::Odometry message in quaternion format
-void publish_quat(ros::Publisher &odom_data_pub_quat)
+  // Change in encoder values
+  delta_pos_left = pos_left_ - pos_left_prev_;
+  delta_pos_right = pos_right_ - pos_right_prev_;
+  // Unit conversion
+  delta_left = delta_pos_left * wheel_conversion_left;
+  delta_right = delta_pos_right * wheel_conversion_right;
+  // Change in pose
+  delta_theta = (delta_right - delta_left) / wheel_distance;
+  theta2 = odomNew_.pose.pose.orientation.z + delta_theta * 0.5;
+  delta_x = (delta_left + delta_right) * 0.5 * cosf(theta2);
+  delta_y = (delta_left + delta_right) * 0.5 * sinf(theta2);
+
+  // Calculate the new pose (x, y, and theta)
+  odomNew_.pose.pose.position.x = odomOld_.pose.pose.position.x + delta_x;
+  odomNew_.pose.pose.position.y = odomOld_.pose.pose.position.y + delta_y;
+  odomNew_.pose.pose.orientation.z = odomOld_.pose.pose.orientation.z + delta_theta;
+
+  // Prevent lockup from a single bad cycle
+  if (isnan(odomNew_.pose.pose.position.x) || isnan(odomNew_.pose.pose.position.y) || isnan(odomNew_.pose.pose.position.z))
+  {
+    odomNew_.pose.pose.position.x = odomOld_.pose.pose.position.x;
+    odomNew_.pose.pose.position.y = odomOld_.pose.pose.position.y;
+    odomNew_.pose.pose.orientation.z = odomOld_.pose.pose.orientation.z;
+  }
+
+  // Make sure theta stays in the correct range
+  if (odomNew_.pose.pose.orientation.z > PI)
+  {
+    odomNew_.pose.pose.orientation.z -= 2 * PI;
+  }
+  else if (odomNew_.pose.pose.orientation.z < -PI)
+  {
+    odomNew_.pose.pose.orientation.z += 2 * PI;
+  }
+
+  // Compute the velocity
+  odomNew_.header.stamp = ros::Time::now();
+  odomNew_.twist.twist.linear.x = 0.5 * (delta_left + delta_right) / (odomNew_.header.stamp.toSec() - odomOld_.header.stamp.toSec());
+  odomNew_.twist.twist.angular.z = delta_theta / (odomNew_.header.stamp.toSec() - odomOld_.header.stamp.toSec());
+
+  // Save the pose data for the next cycle
+  odomOld_.pose.pose.position.x = odomNew_.pose.pose.position.x;
+  odomOld_.pose.pose.position.y = odomNew_.pose.pose.position.y;
+  odomOld_.pose.pose.orientation.z = odomNew_.pose.pose.orientation.z;
+  odomOld_.header.stamp = odomNew_.header.stamp;
+
+  // Update encoder values
+  pos_left_prev_ = pos_left_;
+  pos_right_prev_ = pos_right_;
+}
+
+// Publish the odometry message, euler
+void OdomNode::publish_euler(){
+  odom_data_pub_euler_.publish(odomNew_);
+}
+
+// Publish the odometry message, quat
+void OdomNode::publish_quat()
 {
 
   tf2::Quaternion q;
 
-  q.setRPY(0, 0, odomNew.pose.pose.orientation.z);
+  q.setRPY(0, 0, odomNew_.pose.pose.orientation.z);
 
   nav_msgs::Odometry quatOdom;
-  quatOdom.header.stamp = odomNew.header.stamp;
+  quatOdom.header.stamp = odomNew_.header.stamp;
   quatOdom.header.frame_id = "odom";
   quatOdom.child_frame_id = "base_link";
-  quatOdom.pose.pose.position.x = odomNew.pose.pose.position.x;
-  quatOdom.pose.pose.position.y = odomNew.pose.pose.position.y;
-  quatOdom.pose.pose.position.z = odomNew.pose.pose.position.z;
+  quatOdom.pose.pose.position.x = odomNew_.pose.pose.position.x;
+  quatOdom.pose.pose.position.y = odomNew_.pose.pose.position.y;
+  quatOdom.pose.pose.position.z = odomNew_.pose.pose.position.z;
   quatOdom.pose.pose.orientation.x = q.x();
   quatOdom.pose.pose.orientation.y = q.y();
   quatOdom.pose.pose.orientation.z = q.z();
   quatOdom.pose.pose.orientation.w = q.w();
-  quatOdom.twist.twist.linear.x = odomNew.twist.twist.linear.x;
-  quatOdom.twist.twist.linear.y = odomNew.twist.twist.linear.y;
-  quatOdom.twist.twist.linear.z = odomNew.twist.twist.linear.z;
-  quatOdom.twist.twist.angular.x = odomNew.twist.twist.angular.x;
-  quatOdom.twist.twist.angular.y = odomNew.twist.twist.angular.y;
-  quatOdom.twist.twist.angular.z = odomNew.twist.twist.angular.z;
+  quatOdom.twist.twist.linear.x = odomNew_.twist.twist.linear.x;
+  quatOdom.twist.twist.linear.y = odomNew_.twist.twist.linear.y;
+  quatOdom.twist.twist.linear.z = odomNew_.twist.twist.linear.z;
+  quatOdom.twist.twist.angular.x = odomNew_.twist.twist.angular.x;
+  quatOdom.twist.twist.angular.y = odomNew_.twist.twist.angular.y;
+  quatOdom.twist.twist.angular.z = odomNew_.twist.twist.angular.z;
 
   for (int i = 0; i < SizeOfCovarianceMatrix; i++)
   {
@@ -73,67 +144,10 @@ void publish_quat(ros::Publisher &odom_data_pub_quat)
     }
   }
 
-  odom_data_pub_quat.publish(quatOdom);
+  odom_data_pub_quat_.publish(quatOdom);
 }
 
-// Update odometry information
-void update_odom(ros::Publisher &odom_data_pub)
-{
-
-  long delta_pos_left, delta_pos_right;
-  float delta_left, delta_right, delta_theta, theta2;
-  float delta_x, delta_y;
-
-  delta_pos_left = pos_left - pos_left_prev;
-  delta_pos_right = pos_right - pos_right_prev;
-  delta_left = delta_pos_left * wheel_conversion_left;
-  delta_right = delta_pos_right * wheel_conversion_right;
-  delta_theta = (delta_right - delta_left) / wheel_distance;
-  theta2 = odomNew.pose.pose.orientation.z + delta_theta * 0.5;
-  delta_x = (delta_left + delta_right) * 0.5 * cosf(theta2);
-  delta_y = (delta_left + delta_right) * 0.5 * sinf(theta2);
-
-  // Calculate the new pose (x, y, and theta)
-  odomNew.pose.pose.position.x = odomOld.pose.pose.position.x + delta_x;
-  odomNew.pose.pose.position.y = odomOld.pose.pose.position.y + delta_y;
-  odomNew.pose.pose.orientation.z = odomOld.pose.pose.orientation.z + delta_theta;
-
-  // Prevent lockup from a single bad cycle
-  if (isnan(odomNew.pose.pose.position.x) || isnan(odomNew.pose.pose.position.y) || isnan(odomNew.pose.pose.position.z))
-  {
-    odomNew.pose.pose.position.x = odomOld.pose.pose.position.x;
-    odomNew.pose.pose.position.y = odomOld.pose.pose.position.y;
-    odomNew.pose.pose.orientation.z = odomOld.pose.pose.orientation.z;
-  }
-
-  // Make sure theta stays in the correct range
-  if (odomNew.pose.pose.orientation.z > PI)
-  {
-    odomNew.pose.pose.orientation.z -= 2 * PI;
-  }
-  else if (odomNew.pose.pose.orientation.z < -PI)
-  {
-    odomNew.pose.pose.orientation.z += 2 * PI;
-  }
-  else
-  {
-    // do nothing in correct range already
-  }
-
-  // Compute the velocity
-  odomNew.header.stamp = ros::Time::now();
-  odomNew.twist.twist.linear.x = 0.5 * (delta_left + delta_right) / (odomNew.header.stamp.toSec() - odomOld.header.stamp.toSec());
-  odomNew.twist.twist.angular.z = delta_theta / (odomNew.header.stamp.toSec() - odomOld.header.stamp.toSec());
-
-  // Save the pose data for the next cycle
-  odomOld.pose.pose.position.x = odomNew.pose.pose.position.x;
-  odomOld.pose.pose.position.y = odomNew.pose.pose.position.y;
-  odomOld.pose.pose.orientation.z = odomNew.pose.pose.orientation.z;
-  odomOld.header.stamp = odomNew.header.stamp;
-
-  // Publish the odometry message
-  odom_data_pub.publish(odomNew);
-
-  pos_left_prev = pos_left;
-  pos_right_prev = pos_right;
+nav_msgs::Odometry OdomNode::get_odom(){
+  return odomNew_;
 }
+

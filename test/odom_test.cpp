@@ -25,19 +25,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh_;
     ros::Publisher odom_data_pub = nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100);
 
-    odomNew.header.frame_id = "odom";
-    odomNew.pose.pose.position.z = 0;
-    odomNew.pose.pose.orientation.x = 0;
-    odomNew.pose.pose.orientation.y = 0;
-    odomNew.twist.twist.linear.x = 0;
-    odomNew.twist.twist.linear.y = 0;
-    odomNew.twist.twist.linear.z = 0;
-    odomNew.twist.twist.angular.x = 0;
-    odomNew.twist.twist.angular.y = 0;
-    odomNew.twist.twist.angular.z = 0;
-    odomOld.pose.pose.position.x = 0;
-    odomOld.pose.pose.position.y = 0;
-    odomOld.pose.pose.orientation.z = 0;
+    OdomNode test_odom_node(odom_data_pub, odom_data_pub);
 
     vector<double> left_ticks;
     vector<double> right_ticks;
@@ -66,13 +54,15 @@ int main(int argc, char **argv) {
     // }
 
     // odometry estimate
+    nav_msgs::Odometry cur_odom;
     for (int i=0; i<left_ticks.size(); i++) {
-        pos_left = left_ticks[i];
-        pos_right = right_ticks[i];
-        update_odom(odom_data_pub);
-        ROS_INFO("x: %f", odomNew.pose.pose.position.x);
-        ROS_INFO("y: %f", odomNew.pose.pose.position.y);
-        ROS_INFO("th: %f", odomNew.pose.pose.orientation.z);
+        test_odom_node.update_encoders(left_ticks[i],right_ticks[i]);
+        test_odom_node.update_odom();
+        test_odom_node.publish_euler();
+        cur_odom = test_odom_node.get_odom();
+        ROS_INFO("x: %f", cur_odom.pose.pose.position.x);
+        ROS_INFO("y: %f", cur_odom.pose.pose.position.y);
+        ROS_INFO("th: %f", cur_odom.pose.pose.orientation.z);
 
         this_thread::sleep_for(chrono::milliseconds(100));
     }
