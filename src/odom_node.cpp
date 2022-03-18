@@ -8,7 +8,7 @@
 using namespace std;
 
 // Constructor
-OdomNode::OdomNode(ros::Publisher odom_data_pub_euler, ros::Publisher odom_data_pub_quat):
+OdomNode::OdomNode(ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat):
   odom_data_pub_euler_(odom_data_pub_euler),
   odom_data_pub_quat_(odom_data_pub_quat)
 {
