@@ -48,8 +48,7 @@ private:
     std::string package_path;
     RobotStatus agent_status_;
     std::shared_ptr<RobotStatus> status_ptr_;
-    ros::NodeHandle nh;
-    ros::Publisher status_pub = nh.advertise<std_msgs::String>("status", 1000);
+    
 };
 
 #endif

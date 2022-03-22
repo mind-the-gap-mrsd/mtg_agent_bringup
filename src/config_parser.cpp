@@ -63,6 +63,7 @@ void ConfigParser::configSystemInit(Json::Value config)
 
     std::string path_to_khepera_code = config["path_to_khepera_code"].asString();
     std::string server_ip_add = config["server_ip_address"].asString();
+    // std::string robot_id = config[config1[0]]
     // check if this file exists
     struct stat info;
     assert(stat(&path_to_khepera_code[0], &info) == 0);

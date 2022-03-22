@@ -3,8 +3,8 @@
     "server_ip_address": "192.168.0.111",
     "path_to_khepera_code": "/home/naren/catkin_ws/src/robosar_khepera_code/template",
     "config1": {
-            "jarvis" : {
-                "ip_address" : "192.168.0.109",
+            "agent1": {
+                "ip_address" : "192.168.0.108",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
