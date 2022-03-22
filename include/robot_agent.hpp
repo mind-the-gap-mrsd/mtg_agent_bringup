@@ -12,7 +12,7 @@
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
 #include "robot_status.hpp"
-
+#include "std_msgs/String.h"
 class RobotAgent
 {
 
@@ -48,6 +48,8 @@ private:
     std::string package_path;
     RobotStatus agent_status_;
     std::shared_ptr<RobotStatus> status_ptr_;
+    ros::NodeHandle nh;
+    ros::Publisher status_pub = nh.advertise<std_msgs::String>("status", 1000);
 };
 
 #endif

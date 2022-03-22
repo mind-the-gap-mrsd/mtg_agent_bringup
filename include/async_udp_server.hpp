@@ -54,7 +54,9 @@ public:
             ROS_DEBUG("Received %ld bytes of data!", bytes_recvd);
             deadman_timer_ptr_->stop();
             if (status_ptr_->getStatus() != RobotStatus::ROBOT_STATUS_ACTIVE) {
+              ROS_INFO("BEFORE set status function ");
               status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_ACTIVE);
+
               ROS_WARN("%s: STATUS ACTIVE", &rid_[0]);
             }
 

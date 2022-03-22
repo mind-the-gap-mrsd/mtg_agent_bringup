@@ -52,6 +52,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     {
         ROS_ERROR("Exception: %s\n", e.what());
         agent_status_.setStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
+       
         return;
     }
 
@@ -122,6 +123,9 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
  */
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
     agent_status_.setStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
+    std_msgs::String msg;
+    msg.data = "0";
+    RobotAgent::status_pub.publish(msg);
     ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }

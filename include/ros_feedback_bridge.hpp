@@ -16,7 +16,6 @@
 #include <mutex>
 #include "easylogging++.h"
 #include <ros/package.h>
-
 class ROSFeedbackBridge
 {
 
