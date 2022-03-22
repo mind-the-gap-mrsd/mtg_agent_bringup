@@ -15,7 +15,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 
                                                                                                                                                               path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
                                                                                                                                                               feedback_freq_hz_(feedback_freq), nh_("~" + robot_id), comm_channel_(robot_id, io_service, feedback_port, ip_address, control_port, bridgePtr), work(io_service),
-                                                                                                                                                              odom_TF_pub(nh_)
+                                                                                                                                                       odom_TF_pub(nh_)
 {
 
     // @indraneel initialise communication

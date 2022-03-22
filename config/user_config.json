@@ -1,16 +1,23 @@
 {
     "config_selection": "config1",
-    "server_ip_address": "192.168.0.107",
-    "path_to_khepera_code": "/home/ros-workstation/Projects/robosar/robosar_ws/src/robosar_khepera_code/template",
+    "server_ip_address": "192.168.0.111",
+    "path_to_khepera_code": "/home/naren/catkin_ws/src/robosar_khepera_code/template",
     "config1": {
 
             "agent1" : {
                 "ip_address" : "192.168.0.108",
+                "feedback_port" : 2108,
+                "control_port" : 2000,
+                "feedback_freq_hz" : 10,
+                "control_timeout_ms": 50
+            } ,
+            "jarvis" : {
+                "ip_address" : "192.168.0.109",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
                 "control_timeout_ms": 50
-            }       
+            }            
     }
     
 }

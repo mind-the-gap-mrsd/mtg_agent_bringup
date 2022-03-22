@@ -13,7 +13,7 @@
 
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
-
+std::string robot_active_status = "ROBOT_STATUS_ACTIVE";
 ConfigParser::ConfigParser()
 {
 
@@ -40,7 +40,15 @@ ConfigParser::ConfigParser()
     ROS_INFO("Config file parsed successfully, chosen config : %s", &config["config_selection"].asString()[0]);
 
     configSystemInit(config);
+    sh = nh.advertiseService("agent_status", &ConfigParser::PubAgentInfo, this);
 }
+/**
+ * @brief initialises system based on the user config file
+ * 
+ * @param config user config file
+ * @return void
+ * 
+ */
 
 /**
  * @brief initialises system based on the user config file
@@ -90,4 +98,33 @@ void ConfigParser::configSystemInit(Json::Value config)
     }
 
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
+}
+
+bool ConfigParser::PubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res)
+{
+    std::vector<std::string> status;
+    try
+    {
+        int itr = 0;
+        for (auto agent : agents_vec)
+        {
+            
+            if(std::strcmp(agent->getAgentStatusString().c_str(),robot_active_status.c_str())==0)
+            {
+                status.push_back(agent->robot_id_);
+            }
+            itr++;
+
+        }
+        itr = 0;
+        // status.push_back("AGENT_"+std::to_string(itr));
+        // status.push_back("DEAD");
+        res.agents_active = status;
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cout<<e.what();
+        return false;
+    }
 }
