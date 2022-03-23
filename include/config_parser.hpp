@@ -15,7 +15,8 @@ public:
     ConfigParser();
 
     std::vector<std::shared_ptr<RobotAgent>> agents_vec;
-    bool PubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res); 
+    bool pubAgentInfo(robosar_messages::agent_status::Request  &req,
+                     robosar_messages::agent_status::Response &res); 
 
 private:
     static bool is_initialized_;

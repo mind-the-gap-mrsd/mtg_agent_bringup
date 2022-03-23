@@ -12,7 +12,6 @@
 #include <mutex>
 #include <ros/ros.h>
 #include <ros/package.h>
-#include "std_msgs/String.h"
 class RobotStatus {
 
 public:
@@ -40,7 +39,7 @@ public:
     status_e getStatus();
     void setStatus(status_e new_status);
     ros::NodeHandle nh;
-    ros::Publisher status_pub = nh.advertise<std_msgs::String>("status", 1000);
+    ros::Publisher status_pub;
   
 
 };
