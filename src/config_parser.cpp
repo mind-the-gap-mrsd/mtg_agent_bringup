@@ -14,7 +14,7 @@
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
 
-ConfigParser::ConfigParser()
+ConfigParser::ConfigParser() : nh("~")
 {
 
     // Get path to config file

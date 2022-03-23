@@ -3,7 +3,7 @@
 #include "std_msgs/Bool.h"
 std::atomic<RobotStatus::status_e> status_(RobotStatus::ROBOT_STATUS_ACTIVE);
 
-RobotStatus::RobotStatus() {
+RobotStatus::RobotStatus():nh("~") {
     //status_ = ROBOT_STATUS_ACTIVE;
     status_pub = nh.advertise<std_msgs::Bool>("status", 1000);
 }
