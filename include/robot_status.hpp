@@ -10,7 +10,8 @@
 #include <thread> 
 #include <boost/asio.hpp>
 #include <mutex>
-
+#include <ros/ros.h>
+#include <ros/package.h>
 class RobotStatus {
 
 public:
@@ -37,6 +38,9 @@ public:
 
     status_e getStatus();
     void setStatus(status_e new_status);
+    ros::NodeHandle nh;
+    ros::Publisher status_pub;
+  
 
 };
 

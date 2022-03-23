@@ -14,7 +14,7 @@
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
 
-ConfigParser::ConfigParser()
+ConfigParser::ConfigParser() : nh("~")
 {
 
     // Get path to config file
@@ -40,8 +40,8 @@ ConfigParser::ConfigParser()
     ROS_INFO("Config file parsed successfully, chosen config : %s", &config["config_selection"].asString()[0]);
 
     configSystemInit(config);
+    sh = nh.advertiseService("agent_status", &ConfigParser::pubAgentInfo, this);
 }
-
 /**
  * @brief initialises system based on the user config file
  * 
@@ -55,6 +55,7 @@ void ConfigParser::configSystemInit(Json::Value config)
 
     std::string path_to_khepera_code = config["path_to_khepera_code"].asString();
     std::string server_ip_add = config["server_ip_address"].asString();
+
     // check if this file exists
     struct stat info;
     assert(stat(&path_to_khepera_code[0], &info) == 0);
@@ -90,4 +91,26 @@ void ConfigParser::configSystemInit(Json::Value config)
     }
 
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
+}
+
+bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res)
+{
+    std::vector<std::string> status;
+    try
+    {
+        for (auto agent : agents_vec) {
+            
+            if(std::strcmp(agent->getAgentStatusString().c_str(),"ROBOT_STATUS_ACTIVE")==0)
+            {
+                status.push_back(agent->robot_id_);
+            }
+        }
+        res.agents_active = status;
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cout<<e.what();
+        return false;
+    }
 }

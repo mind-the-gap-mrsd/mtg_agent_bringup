@@ -12,7 +12,6 @@
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
 #include "robot_status.hpp"
-
 class RobotAgent
 {
 
