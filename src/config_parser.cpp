@@ -14,7 +14,7 @@
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
 
-ConfigParser::ConfigParser() : nh("~")
+ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
 {
 
     // Get path to config file
@@ -55,12 +55,14 @@ void ConfigParser::configSystemInit(Json::Value config)
 
     std::string path_to_khepera_code = config["path_to_khepera_code"].asString();
     std::string server_ip_add = config["server_ip_address"].asString();
-    std::set<std::string> agent_names;
 
     // check if this file exists
     struct stat info;
     assert(stat(&path_to_khepera_code[0], &info) == 0);
 
+    simulation_flag = config["simulation"].asBool();
+    if(simulation_flag)
+        ROS_WARN("Simulation flag is active!");
     config = config[config["config_selection"].asString()];
 
     // Iterate through all agents
@@ -78,6 +80,13 @@ void ConfigParser::configSystemInit(Json::Value config)
             agent_names.insert(itr);
         else
             agent_name =  "agent" + std::to_string(it);
+        
+        if(simulation_flag)
+        {
+            std::shared_ptr<RobotAgent> agentPtr(nullptr);
+            agents_vec.push_back(agentPtr);
+            continue;
+        }
         std::shared_ptr<RobotAgent> agentPtr(new RobotAgent(agent_name,
                                                             agent_config["ip_address"].asString(),
                                                             server_ip_add,
@@ -102,6 +111,14 @@ void ConfigParser::configSystemInit(Json::Value config)
 bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res)
 {
     std::vector<std::string> status;
+    if(simulation_flag)
+    {
+        for (auto itr: agent_names)
+            status.push_back(itr);
+        res.agents_active = status;
+        return true;
+    }
+    
     try
     {
         for (auto agent : agents_vec) {
