@@ -8,13 +8,14 @@
 using namespace std;
 
 // Constructor
-OdomNode::OdomNode(ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat):
+OdomNode::OdomNode(const std::string robot_id, ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat):
+  robot_id_(robot_id),
   odom_data_pub_euler_(odom_data_pub_euler),
   odom_data_pub_quat_(odom_data_pub_quat)
 {
   // Initialize odomNew_
-  odomNew_.header.frame_id = "odom";
-  odomNew_.child_frame_id = "base_link";
+  odomNew_.header.frame_id = robot_id_+"/odom";
+  odomNew_.child_frame_id = robot_id_+"/base_link";
   odomNew_.pose.pose.position.z = 0;
   odomNew_.pose.pose.orientation.x = 0;
   odomNew_.pose.pose.orientation.y = 0;
@@ -110,8 +111,8 @@ void OdomNode::publish_quat()
 
   nav_msgs::Odometry quatOdom;
   quatOdom.header.stamp = odomNew_.header.stamp;
-  quatOdom.header.frame_id = "odom";
-  quatOdom.child_frame_id = "base_link";
+  quatOdom.header.frame_id = robot_id_+"/odom";
+  quatOdom.child_frame_id = robot_id_+"/base_link";
   quatOdom.pose.pose.position.x = odomNew_.pose.pose.position.x;
   quatOdom.pose.pose.position.y = odomNew_.pose.pose.position.y;
   quatOdom.pose.pose.position.z = odomNew_.pose.pose.position.z;

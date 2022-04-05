@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh_;
     ros::Publisher odom_data_pub = nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100);
 
-    OdomNode test_odom_node(odom_data_pub, odom_data_pub);
+    OdomNode test_odom_node("testbot", odom_data_pub, odom_data_pub);
 
     vector<double> left_ticks;
     vector<double> right_ticks;

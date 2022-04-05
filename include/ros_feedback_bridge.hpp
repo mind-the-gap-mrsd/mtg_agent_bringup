@@ -24,7 +24,7 @@ public:
     ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):
         nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame(robot_id_+"/base_link"),rid(robot_id_),
         odom_data_pub_euler(nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100)),odom_data_pub_quat(nh_.advertise<nav_msgs::Odometry>("odom_data_quat", 100)),
-        odom_node_(odom_data_pub_euler, odom_data_pub_quat)
+        odom_node_(rid, odom_data_pub_euler, odom_data_pub_quat)
     {
 
         // Create ROS nodes for this agent
