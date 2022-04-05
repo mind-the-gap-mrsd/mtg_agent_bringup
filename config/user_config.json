@@ -5,11 +5,11 @@
     "simulation" : false,
     "config1": {
             "agent1": {
-                "ip_address" : "192.168.0.109",
+                "ip_address" : "192.168.0.110",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
-                "control_timeout_ms": 50
+                "control_timeout_ms": 1000
             }
     }
     
