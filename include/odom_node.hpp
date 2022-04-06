@@ -10,7 +10,7 @@ class OdomNode
 {
 
 public:
-    OdomNode(ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat);
+    OdomNode(const std::string robot_id, ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat);
     ~OdomNode(){};
 
     // Functions
@@ -21,6 +21,8 @@ public:
     nav_msgs::Odometry get_odom(); // get odomNew
 
 private:
+    // Robot id
+    const std::string robot_id_;
     // Publishers
     ros::Publisher &odom_data_pub_euler_;
     ros::Publisher &odom_data_pub_quat_;
