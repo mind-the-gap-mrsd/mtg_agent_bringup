@@ -14,7 +14,7 @@
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
 
-ConfigParser::ConfigParser() : nh("~")
+ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
 {
 
     // Get path to config file
@@ -60,19 +60,34 @@ void ConfigParser::configSystemInit(Json::Value config)
     struct stat info;
     assert(stat(&path_to_khepera_code[0], &info) == 0);
 
+    simulation_flag = config["simulation"].asBool();
+    if(simulation_flag)
+        ROS_WARN("Simulation flag is active!");
     config = config[config["config_selection"].asString()];
 
     // Iterate through all agents
     int it = 0;
-    for (const auto &itr : config)
+    for (const auto &itr : config.getMemberNames())
     {
 
         it++;
         Json::Value agent_config;
-        agent_config = itr;
+        agent_config = config[itr];
 
         // Create new Agent
-        std::shared_ptr<RobotAgent> agentPtr(new RobotAgent("agent" + std::to_string(it),
+        std::string agent_name = itr;
+        if(agent_names.find(itr)==agent_names.end())
+            agent_names.insert(itr);
+        else
+            agent_name =  "agent" + std::to_string(it);
+        
+        if(simulation_flag)
+        {
+            std::shared_ptr<RobotAgent> agentPtr(nullptr);
+            agents_vec.push_back(agentPtr);
+            continue;
+        }
+        std::shared_ptr<RobotAgent> agentPtr(new RobotAgent(agent_name,
                                                             agent_config["ip_address"].asString(),
                                                             server_ip_add,
                                                             path_to_khepera_code,
@@ -87,7 +102,7 @@ void ConfigParser::configSystemInit(Json::Value config)
             agents_vec.push_back(agentPtr);
         }
         //print agent status for awareness
-        ROS_INFO("%s\n", &("AGENT" + std::to_string(it) + " :" + agentPtr->getAgentStatusString())[0]);
+        ROS_INFO("%s\n", &(agent_name + " :" + agentPtr->getAgentStatusString())[0]);
     }
 
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
@@ -96,6 +111,14 @@ void ConfigParser::configSystemInit(Json::Value config)
 bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res)
 {
     std::vector<std::string> status;
+    if(simulation_flag)
+    {
+        for (auto itr: agent_names)
+            status.push_back(itr);
+        res.agents_active = status;
+        return true;
+    }
+    
     try
     {
         for (auto agent : agents_vec) {

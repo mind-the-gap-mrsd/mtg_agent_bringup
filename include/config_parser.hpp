@@ -20,6 +20,8 @@ public:
 
 private:
     static bool is_initialized_;
+    bool simulation_flag;
+    std::set<std::string> agent_names;
 
     void configSystemInit(Json::Value config);
     ros::NodeHandle nh;

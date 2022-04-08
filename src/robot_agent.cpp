@@ -56,7 +56,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     }
 
     // Create ROS nodes for this agent
-    control_subscriber_ = nh_.subscribe("control", 1, &RobotAgent::velocityCallback, this);
+    control_subscriber_ = nh_.subscribe("cmd_vel", 1, &RobotAgent::velocityCallback, this);
 
     status_ptr_ = std::make_shared<RobotStatus>(agent_status_);
     comm_channel_.status_ptr_ = status_ptr_;
