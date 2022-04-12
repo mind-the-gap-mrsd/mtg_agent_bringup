@@ -18,6 +18,7 @@ public:
     void update_odom(); // update OdomNew, OdomOld
     void publish_quat(); // publish quat odom
     void publish_euler(); // publish euler odom
+    void reset();
     nav_msgs::Odometry get_odom(); // get odomNew
 
 private:
