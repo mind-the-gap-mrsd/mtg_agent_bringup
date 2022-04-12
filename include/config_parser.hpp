@@ -7,6 +7,7 @@
 #include "robot_agent.hpp"
 #include <memory>
 #include "robosar_messages/agent_status.h"
+#include "robosar_messages/sys_odom_reset.h"
 class ConfigParser
 {
 
@@ -17,6 +18,8 @@ public:
     std::vector<std::shared_ptr<RobotAgent>> agents_vec;
     bool pubAgentInfo(robosar_messages::agent_status::Request  &req,
                      robosar_messages::agent_status::Response &res); 
+    bool resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &req,
+                     robosar_messages::sys_odom_reset::Response &res); 
 
 private:
     static bool is_initialized_;
@@ -25,7 +28,8 @@ private:
 
     void configSystemInit(Json::Value config);
     ros::NodeHandle nh;
-    ros::ServiceServer sh;
+    ros::ServiceServer sh; // Status service
+    ros::ServiceServer shOdom; // Odom reset service
     
 };
 
