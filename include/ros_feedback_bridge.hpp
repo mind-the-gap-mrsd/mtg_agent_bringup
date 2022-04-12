@@ -152,6 +152,12 @@ public:
         }
     }
 
+    void resetOdometry(){
+        std::lock_guard<std::mutex> guard(mtx);
+        // Update odometry messages
+        odom_node_.reset();
+    }
+
 
 private:
     ros::NodeHandle nh_;
