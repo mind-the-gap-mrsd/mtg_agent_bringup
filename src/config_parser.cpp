@@ -41,6 +41,7 @@ ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
 
     configSystemInit(config);
     sh = nh.advertiseService("agent_status", &ConfigParser::pubAgentInfo, this);
+    shOdom = nh.advertiseService("sys_odom_reset", &ConfigParser::resetAgentsOdom, this);
 }
 /**
  * @brief initialises system based on the user config file
@@ -129,6 +130,24 @@ bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, r
             }
         }
         res.agents_active = status;
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        std::cout<<e.what();
+        return false;
+    }
+}
+
+bool ConfigParser::resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &req, robosar_messages::sys_odom_reset::Response &res)
+{
+    // Reset odometry for each agent
+    try
+    {
+        for (auto agent : agents_vec) {
+            
+            agent->resetOdometry();
+        }
         return true;
     }
     catch(const std::exception& e)

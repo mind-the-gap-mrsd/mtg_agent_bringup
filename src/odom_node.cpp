@@ -16,6 +16,11 @@ OdomNode::OdomNode(const std::string robot_id, ros::Publisher &odom_data_pub_eul
   // Initialize odomNew_
   odomNew_.header.frame_id = robot_id_+"/odom";
   odomNew_.child_frame_id = robot_id_+"/base_link";
+  reset();
+}
+
+void OdomNode::reset(){
+  // Reset odomNew_
   odomNew_.pose.pose.position.z = 0;
   odomNew_.pose.pose.orientation.x = 0;
   odomNew_.pose.pose.orientation.y = 0;
@@ -25,12 +30,11 @@ OdomNode::OdomNode(const std::string robot_id, ros::Publisher &odom_data_pub_eul
   odomNew_.twist.twist.angular.x = 0;
   odomNew_.twist.twist.angular.y = 0;
   odomNew_.twist.twist.angular.z = 0;
-  // Initialize odomOld_
+  // Reset odomOld_
   odomOld_.pose.pose.position.x = 0;
   odomOld_.pose.pose.position.y = 0;
   odomOld_.pose.pose.orientation.z = 0;
 }
-
 // Update encoder values
 void OdomNode::update_encoders(int enc_left, int enc_right){
   pos_left_ = enc_left;

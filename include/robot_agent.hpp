@@ -23,6 +23,7 @@ public:
     RobotStatus::status_e getAgentStatus();
     void velocityCallback(const geometry_msgs::Twist &vel_msg);
     void timerCallback(const ros::TimerEvent& timer_event);
+    void resetOdometry();
     std::string getAgentStatusString();
 
     const std::string path_to_code_;

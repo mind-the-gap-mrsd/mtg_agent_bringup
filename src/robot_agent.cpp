@@ -127,3 +127,13 @@ void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
     ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }
+
+/**
+ * @brief Resets ROS odometry for agent
+ * 
+ * @return void
+ * 
+ */
+void RobotAgent::resetOdometry(){
+    bridgePtr->resetOdometry();
+}
