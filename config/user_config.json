@@ -1,11 +1,11 @@
 {
     "config_selection": "config1",
-    "server_ip_address": "192.168.0.118",
-    "path_to_khepera_code": "/home/ros/Projects/robosar/robosar_ws/src/robosar_khepera_code/template",
+    "server_ip_address": "192.168.2.145",
+    "path_to_khepera_code": "/home/naren/catkin_ws/src/robosar_khepera_code/template",
     "simulation" : false,
     "config1": {
             "agent1": {
-                "ip_address" : "192.168.0.110",
+                "ip_address" : "192.168.2.108",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,

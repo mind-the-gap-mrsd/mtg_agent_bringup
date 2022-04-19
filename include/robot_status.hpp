@@ -40,7 +40,8 @@ public:
     void setStatus(status_e new_status);
     ros::NodeHandle nh;
     ros::Publisher status_pub;
-  
+    std::mutex mutex;
+    RobotStatus::status_e status_;
 
 };
 

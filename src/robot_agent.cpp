@@ -19,12 +19,14 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 {
 
     // @indraneel initialise communication
+    status_ptr_ = std::make_shared<RobotStatus>(); 
+    comm_channel_.status_ptr_ = status_ptr_;
 
     // Set up khepera robot
     std::shared_ptr<SSHSession> sessionPtr(new SSHSession(ip_address_));
     if (!sessionPtr->initiateConnection())
     {
-        agent_status_.setStatus(RobotStatus::ROBOT_STATUS_UNREACHABLE);
+        status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_UNREACHABLE);
         ROS_WARN("Could not reach %s", &robot_id_[0]);
         return;
     }
@@ -51,15 +53,12 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     catch (std::exception &e)
     {
         ROS_ERROR("Exception: %s\n", e.what());
-        agent_status_.setStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
+        status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_COMM_FAIL);
         return;
     }
 
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("cmd_vel", 1, &RobotAgent::velocityCallback, this);
-
-    status_ptr_ = std::make_shared<RobotStatus>(agent_status_);
-    comm_channel_.status_ptr_ = status_ptr_;
 }
 
 RobotAgent::~RobotAgent() {
@@ -90,11 +89,11 @@ RobotAgent::~RobotAgent() {
  */
 RobotStatus::status_e RobotAgent::getAgentStatus()
 {
-    return agent_status_.getStatus();
+    return status_ptr_->getStatus();
 }
 
 std::string RobotAgent::getAgentStatusString() {
-    return agent_status_.robotStatusStrVec[agent_status_.getStatus()];
+    return status_ptr_->robotStatusStrVec[status_ptr_->getStatus()];
 }
 
 
@@ -123,7 +122,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
  * 
  */
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
-    agent_status_.setStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
+    status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
     ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }

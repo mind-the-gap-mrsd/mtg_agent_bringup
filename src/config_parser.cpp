@@ -124,7 +124,7 @@ bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, r
     {
         for (auto agent : agents_vec) {
             
-            if(std::strcmp(agent->getAgentStatusString().c_str(),"ROBOT_STATUS_ACTIVE")==0)
+            if(agent->getAgentStatus()==RobotStatus::ROBOT_STATUS_ACTIVE)
             {
                 status.push_back(agent->robot_id_);
             }

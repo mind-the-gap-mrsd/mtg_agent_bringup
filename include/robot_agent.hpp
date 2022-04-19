@@ -46,7 +46,6 @@ private:
     std::shared_ptr<ros::Timer> timer_ptr_;
     odomTF odom_TF_pub;
     std::string package_path;
-    RobotStatus agent_status_;
     std::shared_ptr<RobotStatus> status_ptr_;
 };
 

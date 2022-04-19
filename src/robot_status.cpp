@@ -1,7 +1,6 @@
 #include "robot_status.hpp"
 #include "robot_agent.hpp"
 #include "std_msgs/Bool.h"
-std::atomic<RobotStatus::status_e> status_(RobotStatus::ROBOT_STATUS_ACTIVE);
 
 RobotStatus::RobotStatus():nh("~") {
     //status_ = ROBOT_STATUS_ACTIVE;
@@ -17,11 +16,13 @@ RobotStatus::RobotStatus():nh("~") {
  * 
  */
 RobotStatus::status_e RobotStatus::getStatus() {
+    std::lock_guard<std::mutex> lock(mutex);
     return status_;
 }
 
 
 void RobotStatus::setStatus(status_e new_status) {
+    std::lock_guard<std::mutex> lock(mutex);
     status_ = new_status;
     
     std_msgs::Bool msg;
