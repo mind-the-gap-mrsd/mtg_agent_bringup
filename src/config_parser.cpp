@@ -95,7 +95,8 @@ void ConfigParser::configSystemInit(Json::Value config)
                                                             agent_config["feedback_port"].asInt(),
                                                             agent_config["control_port"].asInt(),
                                                             agent_config["feedback_freq_hz"].asInt(),
-                                                            agent_config["control_timeout_ms"].asInt()));
+                                                            agent_config["control_timeout_ms"].asInt(),
+                                                            agent_config["deadman_timer_s"].asDouble()));
         // Check if agent is alive
         if (agentPtr->getAgentStatus() == RobotStatus::ROBOT_STATUS_ACTIVE)
         {

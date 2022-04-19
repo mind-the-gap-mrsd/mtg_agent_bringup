@@ -17,4 +17,4 @@ ssh root@${KHEPERA_IP_ADDRESS} pkill template
 scp ${CODE_PATH} root@${KHEPERA_IP_ADDRESS}:/home/root
 
 # Execute latest khepera code with the right arguments
-ssh root@${KHEPERA_IP_ADDRESS} ./template ${SERVER_IP_ADDRESS} ${CONTROL_PORT} ${FEEDBACK_PORT} ${FEEDBACK_FREQUENCY} ${CONTROL_TIMEOUT} &
+ssh root@${KHEPERA_IP_ADDRESS} ./template ${SERVER_IP_ADDRESS} ${CONTROL_PORT} ${FEEDBACK_PORT} ${FEEDBACK_FREQUENCY} ${CONTROL_TIMEOUT}  > /dev/null 2>&1 &
