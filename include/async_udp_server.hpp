@@ -92,7 +92,7 @@ public:
 
   enum
   {
-    max_length = 2000
+    max_length = 25000
   };
   char send_data_[max_length];
   char receive_data_[max_length];
