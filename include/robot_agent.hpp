@@ -12,6 +12,7 @@
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
 #include "robot_status.hpp"
+#include <robosar_messages/agents_status.h>
 class RobotAgent
 {
 
@@ -24,8 +25,11 @@ public:
     RobotStatus::status_e getAgentStatus();
     void velocityCallback(const geometry_msgs::Twist &vel_msg);
     void timerCallback(const ros::TimerEvent& timer_event);
+    void updateAgentStatus(const ros::TimerEvent& timer_event);
+    void calculateFrequency(const ros::TimerEvent& timer_event);
     void resetOdometry();
     std::string getAgentStatusString();
+    int getActualFrequency();
 
     const std::string path_to_code_;
     const std::string robot_id_;
@@ -35,6 +39,8 @@ public:
     const int control_port_;
     const int feedback_freq_hz_;
     const int control_timeout_ms_;
+    const int freq_calculation_dur = 5;
+    robosar_messages::agents_status agent_status_;
 
 private:
     boost::asio::io_service io_service;
@@ -44,10 +50,14 @@ private:
     udp_server comm_channel_;
     ros::Subscriber control_subscriber_;
     ros::Timer deadman_timer_;
+    ros::Timer feedback_timer_;
+    ros::Timer freq_calculation_timer_;
+    int actual_freq_hz;
     std::shared_ptr<ros::Timer> timer_ptr_;
     odomTF odom_TF_pub;
     std::string package_path;
     std::shared_ptr<RobotStatus> status_ptr_;
+    ros::Publisher agent_status_publisher_;
 };
 
 #endif

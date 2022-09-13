@@ -7,7 +7,7 @@
 #include <ros/package.h>
 #include "boost/bind.hpp"
 #include <boost/thread.hpp>
-
+#include <robosar_messages/agents_status.h>
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const int feedback_port, const int control_port, 
                        const int feedback_freq, const int control_timeout, const double deadman_timer_duration) :
@@ -39,6 +39,8 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
                   " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " + std::to_string(feedback_freq_hz_) + " " + std::to_string(control_timeout_ms_))[0]);
     
     deadman_timer_ = nh_.createTimer(ros::Duration(deadman_timer_duration), boost::bind(&RobotAgent::timerCallback, this, _1));
+    feedback_timer_ = nh_.createTimer(ros::Duration(1/feedback_freq_hz_),boost::bind(&RobotAgent::updateAgentStatus, this, _1));
+    freq_calculation_timer_ = nh_.createTimer(ros::Duration(freq_calculation_dur),boost::bind(&RobotAgent::calculateFrequency, this, _1));
     // Timer only starts once agent is up
     deadman_timer_.stop();
     timer_ptr_ = std::make_shared<ros::Timer>(deadman_timer_);
@@ -59,6 +61,9 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("cmd_vel", 1, &RobotAgent::velocityCallback, this);
+
+    //status publisher
+    agent_status_publisher_ = nh_.advertise<robosar_messages::agents_status>("status", 1);
 }
 
 RobotAgent::~RobotAgent() {
@@ -127,6 +132,35 @@ void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
     timer_ptr_->stop();
 }
 
+/**
+ * @brief Updates the agent status at feedback frequency
+ *
+ * @return void
+ *
+ */
+void RobotAgent::updateAgentStatus(const ros::TimerEvent& timer_event) {
+    robosar_messages::agents_status agent_status_;
+    agent_status_.ip_adress = ip_address_;
+    agent_status_.battery_lvl = bridgePtr->getBatteryLvl(); // hardcoded for testing, will change to jae's implementation
+    agent_status_.feedback_freq = this->getActualFrequency(); // need to check if freq is correct
+    agent_status_.status = this->getAgentStatusString();
+    agent_status_publisher_.publish(agent_status_);
+}
+
+/**
+ * @brief Calculates the actual feedback frequency
+ *
+ * @return void
+ *
+ */
+void RobotAgent::calculateFrequency(const ros::TimerEvent& timer_event) {
+    this->actual_freq_hz = bridgePtr->getMessageCounter()/freq_calculation_dur;
+    bridgePtr->setMessageCounter(0);
+}
+
+int RobotAgent::getActualFrequency(){
+    return this->actual_freq_hz;
+}
 /**
  * @brief Resets ROS odometry for agent
  * 
