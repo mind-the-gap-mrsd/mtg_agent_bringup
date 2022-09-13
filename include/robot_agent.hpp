@@ -18,8 +18,9 @@ class RobotAgent
 public:
     ~RobotAgent();
     RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
-               const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout,
-               const double deadman_timer_duration);
+               const std::string path_to_code, const std::string path_to_perception_code, const int feedback_port, const int control_port, 
+               const int feedback_freq, const int control_timeout,
+               const double deadman_timer_duration, const bool camera_enabled);
 
     RobotStatus::status_e getAgentStatus();
     void velocityCallback(const geometry_msgs::Twist &vel_msg);
