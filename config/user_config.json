@@ -10,7 +10,8 @@
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
                 "control_timeout_ms": 1000,
-                "deadman_timer_s": 5.0
+                "deadman_timer_s": 5.0,
+                "freq_calculation_duration": 5
             }
     }
     

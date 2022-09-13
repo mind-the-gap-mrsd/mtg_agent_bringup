@@ -20,7 +20,7 @@ public:
     ~RobotAgent();
     RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                const std::string path_to_code, const int feedback_port, const int control_port, const int feedback_freq, const int control_timeout,
-               const double deadman_timer_duration);
+               const double deadman_timer_duration, const int freq_calculation_dur);
 
     RobotStatus::status_e getAgentStatus();
     void velocityCallback(const geometry_msgs::Twist &vel_msg);
@@ -39,7 +39,7 @@ public:
     const int control_port_;
     const int feedback_freq_hz_;
     const int control_timeout_ms_;
-    const int freq_calculation_dur = 5;
+    const int freq_calculation_dur_;
     robosar_messages::agents_status agent_status_;
 
 private:
