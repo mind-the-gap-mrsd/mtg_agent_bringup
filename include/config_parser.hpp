@@ -8,6 +8,7 @@
 #include <memory>
 #include "robosar_messages/agent_status.h"
 #include "robosar_messages/sys_odom_reset.h"
+#include "robosar_messages/agents_status.h"
 class ConfigParser
 {
 
@@ -16,6 +17,7 @@ public:
     ConfigParser();
 
     std::vector<std::shared_ptr<RobotAgent>> agents_vec;
+    void publishAgentStatus(const ros::TimerEvent& timer_event);
     bool pubAgentInfo(robosar_messages::agent_status::Request  &req,
                      robosar_messages::agent_status::Response &res); 
     bool resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &req,
@@ -30,7 +32,8 @@ private:
     ros::NodeHandle nh;
     ros::ServiceServer sh; // Status service
     ros::ServiceServer shOdom; // Odom reset service
-    
+    ros::Publisher agent_status_pub_;
+    ros::Timer feedback_timer_;
 };
 
 #endif

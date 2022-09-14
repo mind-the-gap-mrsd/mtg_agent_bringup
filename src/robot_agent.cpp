@@ -39,7 +39,6 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
                   " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " + std::to_string(feedback_freq_hz_) + " " + std::to_string(control_timeout_ms_))[0]);
     
     deadman_timer_ = nh_.createTimer(ros::Duration(deadman_timer_duration), boost::bind(&RobotAgent::timerCallback, this, _1));
-    feedback_timer_ = nh_.createTimer(ros::Duration(1/feedback_freq_hz_),boost::bind(&RobotAgent::updateAgentStatus, this, _1));
     freq_calculation_timer_ = nh_.createTimer(ros::Duration(freq_calculation_dur_),boost::bind(&RobotAgent::calculateFrequency, this, _1));
     // Timer only starts once agent is up
     deadman_timer_.stop();
@@ -61,9 +60,6 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
 
     // Create ROS nodes for this agent
     control_subscriber_ = nh_.subscribe("cmd_vel", 1, &RobotAgent::velocityCallback, this);
-
-    //status publisher
-    agent_status_publisher_ = nh_.advertise<robosar_messages::agents_status>("status", 1);
 }
 
 RobotAgent::~RobotAgent() {
@@ -133,21 +129,6 @@ void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
 }
 
 /**
- * @brief Updates the agent status at feedback frequency
- *
- * @return void
- *
- */
-void RobotAgent::updateAgentStatus(const ros::TimerEvent& timer_event) {
-    robosar_messages::agents_status agent_status_;
-    agent_status_.ip_adress = ip_address_;
-    agent_status_.battery_lvl = bridgePtr->getBatteryLvl();
-    agent_status_.feedback_freq = this->getActualFrequency();
-    agent_status_.status = this->getAgentStatusString();
-    agent_status_publisher_.publish(agent_status_);
-}
-
-/**
  * @brief Calculates the actual feedback frequency
  *
  * @return void
@@ -155,11 +136,18 @@ void RobotAgent::updateAgentStatus(const ros::TimerEvent& timer_event) {
  */
 void RobotAgent::calculateFrequency(const ros::TimerEvent& timer_event) {
     this->actual_freq_hz = bridgePtr->getMessageCounter()/freq_calculation_dur_;
+
+    //Battery Level wont change much, hence sufficient to update it at low freq
+    this->battery_lvl = bridgePtr->getBatteryLvl();
     bridgePtr->setMessageCounter(0);
 }
 
 int RobotAgent::getActualFrequency(){
     return this->actual_freq_hz;
+}
+
+int RobotAgent::getBatteryLevel(){
+    return this->battery_lvl;
 }
 /**
  * @brief Resets ROS odometry for agent

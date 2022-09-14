@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include "robot_status.hpp"
 #include "easylogging++.h"
+#include "robosar_messages/agents_status.h"
 
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
@@ -42,6 +43,8 @@ ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
     configSystemInit(config);
     sh = nh.advertiseService("agent_status", &ConfigParser::pubAgentInfo, this);
     shOdom = nh.advertiseService("sys_odom_reset", &ConfigParser::resetAgentsOdom, this);
+    agent_status_pub_ = nh.advertise<robosar_messages::agents_status>("all_agent_status", 1);
+    feedback_timer_ = nh.createTimer(ros::Duration(config["update_status_dur"].asInt()),boost::bind(&ConfigParser::publishAgentStatus, this, _1));
 }
 /**
  * @brief initialises system based on the user config file
@@ -158,4 +161,26 @@ bool ConfigParser::resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &r
         std::cout<<e.what();
         return false;
     }
+}
+
+void ConfigParser::publishAgentStatus(const ros::TimerEvent& timer_event) {
+    std::vector<std::string> all_robot_id;
+    std::vector<std::string> all_ip;
+    std::vector<int> all_battery_lvl;
+    std::vector<int> all_feedback_freq;
+    std::vector<std::string> all_status;
+    robosar_messages::agents_status all_agents_status;
+    for (auto agent : agents_vec) {
+        all_robot_id.push_back(agent->robot_id_);
+        all_ip.push_back(agent->ip_address_);
+        all_battery_lvl.push_back(agent->getBatteryLevel());
+        all_feedback_freq.push_back(agent->getActualFrequency());
+        all_status.push_back(agent->getAgentStatusString());
+    }
+    all_agents_status.robot_id = all_robot_id;
+    all_agents_status.ip_adress = all_ip;
+    all_agents_status.battery_lvl = all_battery_lvl;
+    all_agents_status.feedback_freq = all_feedback_freq;
+    all_agents_status.status = all_status;
+    agent_status_pub_.publish(all_agents_status);
 }

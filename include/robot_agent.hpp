@@ -30,6 +30,7 @@ public:
     void resetOdometry();
     std::string getAgentStatusString();
     int getActualFrequency();
+    int getBatteryLevel();
 
     const std::string path_to_code_;
     const std::string robot_id_;
@@ -53,6 +54,7 @@ private:
     ros::Timer feedback_timer_;
     ros::Timer freq_calculation_timer_;
     int actual_freq_hz;
+    int battery_lvl;
     std::shared_ptr<ros::Timer> timer_ptr_;
     odomTF odom_TF_pub;
     std::string package_path;

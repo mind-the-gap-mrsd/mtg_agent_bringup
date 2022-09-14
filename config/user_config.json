@@ -3,6 +3,7 @@
     "server_ip_address": "192.168.2.140",
     "path_to_khepera_code": "/home/ros/Projects/robosar/robosar_ws/src/robosar_khepera_code/template",
     "simulation" : false,
+    "update_status_dur" : 10,
     "config1": {
             "agent1": {
                 "ip_address" : "192.168.2.109",
