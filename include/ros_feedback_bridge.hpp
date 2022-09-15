@@ -133,6 +133,31 @@ public:
         }
 
         lrf_publisher_.publish(lrf_msg);
+
+        // Apriltag detections
+        robosar_fms::AllDetections apriltag_feedback = feedback->april_detections();
+        for(int i=0;i<apriltag_feedback.tag_detections_size();i++) {
+            robosar_fms::AprilTagDetection tag = apriltag_feedback.tag_detections(i);
+
+            logger->info("Detected tag id %v",tag.tag_id());
+
+            // apriltag_ros::AprilTagDetectionArray tag_msg;
+            // tag_msg.header.frame_id = khepera_frame;
+            // tag_msg.header.stamp = ros::Time::now();
+            // tag_msg.header.seq = feedback->seq_id();
+            // apriltag_ros::AprilTagDetection tag_detection;
+            // tag_detection.id = tag.id();
+            // tag_detection.size = tag.size();
+            // tag_detection.pose.pose.position.x = tag.pose().position().x();
+            // tag_detection.pose.pose.position.y = tag.pose().position().y();
+            // tag_detection.pose.pose.position.z = tag.pose().position().z();
+            // tag_detection.pose.pose.orientation.x = tag.pose().orientation().x();
+            // tag_detection.pose.pose.orientation.y = tag.pose().orientation().y();
+            // tag_detection.pose.pose.orientation.z = tag.pose().orientation().z();
+            // tag_detection.pose.pose.orientation.w = tag.pose().orientation().w();
+            // tag_msg.detections.push_back(tag_detection);
+            // apriltag_publisher_.publish(tag_msg);
+        }
     }
 
     void runOdometry()

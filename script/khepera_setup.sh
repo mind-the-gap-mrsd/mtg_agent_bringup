@@ -27,7 +27,5 @@ then
     scp ${PERCEPTION_CODE_PATH} root@${KHEPERA_IP_ADDRESS}:/home/root
 
     # Run the script 
-    ssh root@${KHEPERA_IP_ADDRESS} ./template_perception > /dev/null 2>&1 &
-else
-    echo ${CAMERA_ENABLED}   
+    ssh root@${KHEPERA_IP_ADDRESS} ./template_perception > /dev/null 2>&1 &  
 fi
