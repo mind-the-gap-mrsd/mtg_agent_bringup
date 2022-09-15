@@ -41,11 +41,15 @@ ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
     ROS_INFO("Config file parsed successfully, chosen config : %s", &config["config_selection"].asString()[0]);
 
     configSystemInit(config);
+
     sh = nh.advertiseService("agent_status", &ConfigParser::pubAgentInfo, this);
     shOdom = nh.advertiseService("sys_odom_reset", &ConfigParser::resetAgentsOdom, this);
     agent_status_pub_ = nh.advertise<robosar_messages::agents_status>("all_agent_status", 1);
+    if(!config["simulation"].asBool()){
     feedback_timer_ = nh.createTimer(ros::Duration(config["update_status_dur"].asInt()),boost::bind(&ConfigParser::publishAgentStatus, this, _1));
+    }
 }
+
 /**
  * @brief initialises system based on the user config file
  * 
@@ -101,6 +105,9 @@ void ConfigParser::configSystemInit(Json::Value config)
                                                             agent_config["control_timeout_ms"].asInt(),
                                                             agent_config["deadman_timer_s"].asDouble(),
                                                             agent_config["freq_calculation_duration"].asInt()));
+
+        // Adding all agents (not only the ones alive) to the vector
+        all_agents_vec.push_back(agentPtr);
 
         // Check if agent is alive
         if (agentPtr->getAgentStatus() == RobotStatus::ROBOT_STATUS_ACTIVE)
@@ -170,7 +177,7 @@ void ConfigParser::publishAgentStatus(const ros::TimerEvent& timer_event) {
     std::vector<int> all_feedback_freq;
     std::vector<std::string> all_status;
     robosar_messages::agents_status all_agents_status;
-    for (auto agent : agents_vec) {
+    for (auto agent : all_agents_vec) {
         all_robot_id.push_back(agent->robot_id_);
         all_ip.push_back(agent->ip_address_);
         all_battery_lvl.push_back(agent->getBatteryLevel());

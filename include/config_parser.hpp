@@ -17,6 +17,8 @@ public:
     ConfigParser();
 
     std::vector<std::shared_ptr<RobotAgent>> agents_vec;
+    // Creating another vector as need to maintain all agents not just the ones alive
+    std::vector<std::shared_ptr<RobotAgent>> all_agents_vec;
     void publishAgentStatus(const ros::TimerEvent& timer_event);
     bool pubAgentInfo(robosar_messages::agent_status::Request  &req,
                      robosar_messages::agent_status::Response &res); 
