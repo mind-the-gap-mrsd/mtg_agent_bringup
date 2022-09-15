@@ -135,7 +135,6 @@ public:
         }
 
         message_counter++;
-        ROS_INFO("Increasing message counter - %d",message_counter);
         lrf_publisher_.publish(lrf_msg);
     }
 
