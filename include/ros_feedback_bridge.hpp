@@ -139,7 +139,11 @@ public:
         for(int i=0;i<apriltag_feedback.tag_detections_size();i++) {
             robosar_fms::AprilTagDetection tag = apriltag_feedback.tag_detections(i);
 
-            logger->info("Detected tag id %v",tag.tag_id());
+            logger->info("Apriltag id %v w translation %v %v %v and rotation mat %v %v %v | %v %v %v | %v %v %v",
+                            tag.tag_id(), tag.pose().t().x(),tag.pose().t().y(),tag.pose().t().z(), \
+                             tag.pose().r().r11(),tag.pose().r().r12(),tag.pose().r().r13(),
+                             tag.pose().r().r21(),tag.pose().r().r22(),tag.pose().r().r23(),
+                             tag.pose().r().r31(),tag.pose().r().r32(),tag.pose().r().r33());
 
             // apriltag_ros::AprilTagDetectionArray tag_msg;
             // tag_msg.header.frame_id = khepera_frame;
