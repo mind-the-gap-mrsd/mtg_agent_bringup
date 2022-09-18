@@ -10,12 +10,17 @@
 #include "robosar.pb.h"
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
+#include <apriltag_ros/AprilTagDetectionArray.h>
+#include <apriltag_ros/AprilTagDetection.h>
 #include <angles/angles.h>
 #include "odom_node.hpp"
 #include <nav_msgs/Odometry.h>
 #include <mutex>
 #include "easylogging++.h"
 #include <ros/package.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+
 class ROSFeedbackBridge
 {
 
@@ -29,6 +34,7 @@ public:
         // Create ROS nodes for this agent
         imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("feedback/IMU", 1, true);
         lrf_publisher_ = nh_.advertise<sensor_msgs::LaserScan>("feedback/scan", 1, true);
+        apriltag_publisher_ = nh_.advertise<apriltag_ros::AprilTagDetectionArray>("feedback/apriltag", 1, true);
 
         //// Start Odom node
         odom_delay_ms = (int)((1.0/(double)(odom_freq_hz))*1000.0);
@@ -133,6 +139,50 @@ public:
         }
 
         lrf_publisher_.publish(lrf_msg);
+
+        // Apriltag detections
+        robosar_fms::AllDetections apriltag_feedback = feedback->april_detections();
+        apriltag_ros::AprilTagDetectionArray tag_msg;
+        tag_msg.header.frame_id = khepera_frame;
+        tag_msg.header.stamp = ros::Time::now();
+        tag_msg.header.seq = feedback->seq_id();
+
+        for(int i=0;i<apriltag_feedback.tag_detections_size();i++) {
+            robosar_fms::AprilTagDetection tag = apriltag_feedback.tag_detections(i);
+
+            logger->info("Apriltag id %v w translation %v %v %v and rotation mat %v %v %v | %v %v %v | %v %v %v",
+                            tag.tag_id(), tag.pose().t().x(),tag.pose().t().y(),tag.pose().t().z(), \
+                             tag.pose().r().r11(),tag.pose().r().r12(),tag.pose().r().r13(),
+                             tag.pose().r().r21(),tag.pose().r().r22(),tag.pose().r().r23(),
+                             tag.pose().r().r31(),tag.pose().r().r32(),tag.pose().r().r33());
+
+            apriltag_ros::AprilTagDetection tag_detection;
+            tag_detection.id.push_back(static_cast<int>(tag.tag_id()));
+            //tag_detection.size = tag.size();
+            tag_detection.pose.pose.pose.position.x =  tag.pose().t().x();
+            tag_detection.pose.pose.pose.position.y =  tag.pose().t().y();
+            tag_detection.pose.pose.pose.position.z =  tag.pose().t().z();
+
+            // Rotation matrix to euler angles
+            tf2::Matrix3x3 mat(tag.pose().r().r11(),tag.pose().r().r12(),tag.pose().r().r13(),
+                              tag.pose().r().r21(),tag.pose().r().r22(),tag.pose().r().r23(),
+                              tag.pose().r().r31(),tag.pose().r().r32(),tag.pose().r().r33());
+            
+            double roll, pitch, yaw;
+            mat.getRPY(roll, pitch, yaw);
+            // Euler angles to quaternion
+            tf2::Quaternion quat;
+            quat.setRPY(roll, pitch, yaw);
+            quat.normalize();
+
+            tag_detection.pose.pose.pose.orientation.x = quat.x();
+            tag_detection.pose.pose.pose.orientation.y = quat.y();
+            tag_detection.pose.pose.pose.orientation.z = quat.z();
+            tag_detection.pose.pose.pose.orientation.w = quat.w();
+            tag_msg.detections.push_back(tag_detection);
+        }
+        if(apriltag_feedback.tag_detections_size()>0)
+            apriltag_publisher_.publish(tag_msg);
     }
 
     void runOdometry()
@@ -165,6 +215,7 @@ private:
     ros::Publisher odom_data_pub_euler;
     ros::Publisher odom_data_pub_quat;
     ros::Publisher lrf_publisher_;
+    ros::Publisher apriltag_publisher_;
     std::string khepera_frame;
     std::thread odom_thread_;
     bool node_alive_;

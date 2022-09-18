@@ -55,6 +55,7 @@ void ConfigParser::configSystemInit(Json::Value config)
 {
 
     std::string path_to_khepera_code = config["path_to_khepera_code"].asString();
+    std::string path_to_perception_code = config["path_to_perception_code"].asString();
     std::string server_ip_add = config["server_ip_address"].asString();
 
     // check if this file exists
@@ -92,11 +93,13 @@ void ConfigParser::configSystemInit(Json::Value config)
                                                             agent_config["ip_address"].asString(),
                                                             server_ip_add,
                                                             path_to_khepera_code,
+                                                            path_to_perception_code,
                                                             agent_config["feedback_port"].asInt(),
                                                             agent_config["control_port"].asInt(),
                                                             agent_config["feedback_freq_hz"].asInt(),
                                                             agent_config["control_timeout_ms"].asInt(),
-                                                            agent_config["deadman_timer_s"].asDouble()));
+                                                            agent_config["deadman_timer_s"].asDouble(),
+                                                            agent_config["camera_enabled"].asBool()));
         // Check if agent is alive
         if (agentPtr->getAgentStatus() == RobotStatus::ROBOT_STATUS_ACTIVE)
         {
