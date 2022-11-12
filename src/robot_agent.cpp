@@ -9,8 +9,8 @@
 #include <boost/thread.hpp>
 #include <robosar_messages/agents_status.h>
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
-                       const std::string path_to_code, const int feedback_port, const int control_port, 
-                       const int feedback_freq, const int control_timeout, const double deadman_timer_duration, const int freq_calculation_dur) :
+                       const std::string path_to_code, const std::string path_to_perception_code, const int feedback_port, const int control_port, 
+                       const int feedback_freq, const int control_timeout, const double deadman_timer_duration, const int freq_calculation_dur, const bool camera_enabled) :
 
                         robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr),bridgePtr(std::make_shared<ROSFeedbackBridge>(robot_id,nh_,feedback_freq)),
                         path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
@@ -31,13 +31,20 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
         return;
     }
 
+    if(camera_enabled) {
+        struct stat info;
+        assert(stat(&path_to_perception_code[0], &info) == 0);
+    }
+
     // Get path to config file
     package_path = ros::package::getPath("robosar_agent_bringup");
     std::string shell = package_path + "/script/khepera_setup.sh";
     // Run setup script
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +
-                  " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " + std::to_string(feedback_freq_hz_) + " " + std::to_string(control_timeout_ms_))[0]);
-    
+                  " " + std::to_string(feedback_port_) + " " + std::to_string(control_port_) + " " + 
+                  std::to_string(feedback_freq_hz_) + " " + std::to_string(control_timeout_ms_) +
+                  " " +  std::to_string(camera_enabled) +" " + path_to_perception_code)[0]);
+
     deadman_timer_ = nh_.createTimer(ros::Duration(deadman_timer_duration), boost::bind(&RobotAgent::timerCallback, this, _1));
     freq_calculation_timer_ = nh_.createTimer(ros::Duration(freq_calculation_dur_),boost::bind(&RobotAgent::calculateFrequency, this, _1));
     // Timer only starts once agent is up

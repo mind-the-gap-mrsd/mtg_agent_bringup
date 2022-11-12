@@ -1,19 +1,22 @@
 {
     "config_selection": "config1",
-    "server_ip_address": "192.168.2.140",
-    "path_to_khepera_code": "/home/ros/Projects/robosar/robosar_ws/src/robosar_khepera_code/template",
+    "server_ip_address": "192.168.2.213",
+    "path_to_khepera_code": "/home/neel/Projects/robosar_ws/src/robosar_khepera_code/template",
+    "path_to_perception_code": "/home/neel/Projects/robosar_ws/src/robosar_khepera_perception/template_perception",
     "simulation" : false,
     "update_status_dur" : 10,
     "config1": {
-            "agent1": {
+            "agent_0": {
                 "ip_address" : "192.168.2.109",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
                 "control_timeout_ms": 1000,
                 "deadman_timer_s": 5.0,
-                "freq_calculation_duration": 5
+                "freq_calculation_duration": 5,
+                "camera_enabled": false
             }
+
     }
     
 }

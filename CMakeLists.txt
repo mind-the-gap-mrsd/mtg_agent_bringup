@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
   robosar_messages
   robosar_tf
   angles
+  apriltag_ros
+  tf2
 )
 
 ## System dependencies are found with CMake's conventions

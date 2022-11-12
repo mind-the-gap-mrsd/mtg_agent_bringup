@@ -2,7 +2,7 @@
 #include "robot_agent.hpp"
 #include "std_msgs/Bool.h"
 
-RobotStatus::RobotStatus():nh("~") {
+RobotStatus::RobotStatus():nh("~"),status_(ROBOT_STATUS_ACTIVE) {
     //status_ = ROBOT_STATUS_ACTIVE;
     status_pub = nh.advertise<std_msgs::Bool>("status", 1000);
 }
