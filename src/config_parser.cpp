@@ -96,6 +96,7 @@ void ConfigParser::configSystemInit(Json::Value config)
             agents_vec.push_back(agentPtr);
             continue;
         }
+        assert(agent_config["freq_calculation_duration"].asInt() != 0);
         std::shared_ptr<RobotAgent> agentPtr(new RobotAgent(agent_name,
                                                             agent_config["ip_address"].asString(),
                                                             server_ip_add,
