@@ -18,9 +18,9 @@
 #include <mutex>
 #include "easylogging++.h"
 #include <ros/package.h>
+#include <robosar_messages/agents_status.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-
 class ROSFeedbackBridge
 {
 
@@ -80,6 +80,7 @@ public:
 
         ROS_DEBUG("Unpacking message");
 
+        battery_lvl = feedback->agent_status_data().battery_level();
         //IMU
         sensor_msgs::Imu imu_msg;
         
@@ -138,6 +139,7 @@ public:
             lrf_msg.ranges.push_back((float)(lrf_feedback.values(i))/1000.0f);
         }
 
+        message_counter++;
         lrf_publisher_.publish(lrf_msg);
 
         // Apriltag detections
@@ -208,7 +210,19 @@ public:
         odom_node_.reset();
     }
 
+    int getMessageCounter(){
+        std::lock_guard<std::mutex> guard(mtx);
+        return message_counter;
+    }
 
+    int getBatteryLvl(){
+        std::lock_guard<std::mutex> guard(mtx);
+        return battery_lvl;
+    }
+    void setMessageCounter(int count){
+        std::lock_guard<std::mutex> guard(mtx);
+        message_counter=count;
+    }
 private:
     ros::NodeHandle nh_;
     ros::Publisher imu_publisher_;
@@ -225,6 +239,8 @@ private:
     el::Logger* logger; 
     std::string rid;
     OdomNode odom_node_;
+    int message_counter;
+    int battery_lvl;
 };
 
 #endif
