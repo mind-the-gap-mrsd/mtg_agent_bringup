@@ -7,15 +7,15 @@
 #include <ros/package.h>
 #include "boost/bind.hpp"
 #include <boost/thread.hpp>
-
+#include <robosar_messages/agents_status.h>
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const std::string path_to_perception_code, const int feedback_port, const int control_port, 
-                       const int feedback_freq, const int control_timeout, const double deadman_timer_duration, const bool camera_enabled) :
+                       const int feedback_freq, const int control_timeout, const double deadman_timer_duration, const int freq_calculation_dur, const bool camera_enabled) :
 
                         robot_id_(robot_id), ip_address_(ip_address), server_ip_addr_(server_ip_addr),bridgePtr(std::make_shared<ROSFeedbackBridge>(robot_id,nh_,feedback_freq)),
                         path_to_code_(path_to_code), feedback_port_(feedback_port), control_port_(control_port), control_timeout_ms_(control_timeout),
                         feedback_freq_hz_(feedback_freq), nh_("~" + robot_id), comm_channel_(robot_id, io_service, feedback_port, ip_address, control_port, bridgePtr), work(io_service),
-                        odom_TF_pub(nh_, robot_id)
+                        odom_TF_pub(nh_, robot_id), freq_calculation_dur_(freq_calculation_dur)
 {
 
     // @indraneel initialise communication
@@ -46,6 +46,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
                   " " +  std::to_string(camera_enabled) +" " + path_to_perception_code)[0]);
 
     deadman_timer_ = nh_.createTimer(ros::Duration(deadman_timer_duration), boost::bind(&RobotAgent::timerCallback, this, _1));
+    freq_calculation_timer_ = nh_.createTimer(ros::Duration(freq_calculation_dur_),boost::bind(&RobotAgent::calculateFrequency, this, _1));
     // Timer only starts once agent is up
     deadman_timer_.stop();
     timer_ptr_ = std::make_shared<ros::Timer>(deadman_timer_);
@@ -134,6 +135,27 @@ void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
     timer_ptr_->stop();
 }
 
+/**
+ * @brief Calculates the actual feedback frequency
+ *
+ * @return void
+ *
+ */
+void RobotAgent::calculateFrequency(const ros::TimerEvent& timer_event) {
+    this->actual_freq_hz = bridgePtr->getMessageCounter()/freq_calculation_dur_;
+
+    //Battery Level wont change much, hence sufficient to update it at low freq
+    this->battery_lvl = bridgePtr->getBatteryLvl();
+    bridgePtr->setMessageCounter(0);
+}
+
+int RobotAgent::getActualFrequency(){
+    return this->actual_freq_hz;
+}
+
+int RobotAgent::getBatteryLevel(){
+    return this->battery_lvl;
+}
 /**
  * @brief Resets ROS odometry for agent
  * 
