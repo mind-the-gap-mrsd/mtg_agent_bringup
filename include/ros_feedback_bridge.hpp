@@ -28,7 +28,7 @@ public:
     ROSFeedbackBridge(std::string robot_id_, ros::NodeHandle nh,const int fb_freq_):
         nh_(nh),node_alive_(true),odom_freq_hz(fb_freq_*2),khepera_frame(robot_id_+"/base_link"),rid(robot_id_),
         odom_data_pub_euler(nh_.advertise<nav_msgs::Odometry>("odom_data_euler", 100)),odom_data_pub_quat(nh_.advertise<nav_msgs::Odometry>("odom_data_quat", 100)),
-        odom_node_(rid, odom_data_pub_euler, odom_data_pub_quat)
+        odom_node_(rid, odom_data_pub_euler, odom_data_pub_quat), seq_id_prev_(-1)
     {
 
         // Create ROS nodes for this agent
@@ -79,7 +79,34 @@ public:
     void unpack_feedback_message(robosar_fms::SensorData* feedback) {
 
         ROS_DEBUG("Unpacking message");
-
+        // Sequence ID
+        int32_t seq_diff = feedback->seq_id() - seq_id_prev_;
+        if(seq_diff < 0)
+        {
+            // Gone backwards; out of order. Log, report, discard.
+            ROS_WARN("[unpack_feedback_message] Packets out of order for %s; expected sequence ID %d, got %u. Ignoring.", rid.c_str(), seq_id_prev_+1, feedback->seq_id());
+            logger->info("    WARNING: Packets out of order detected (prev: %v, new: %v)", seq_id_prev_, feedback->seq_id());
+            return;
+        }
+        else if(seq_diff == 0)
+        {
+            // Duplicate; something is very wrong. Log, report, discard.
+            ROS_WARN("[unpack_feedback_message] Repeated packet for %s; expected sequence ID %d, got %u.", rid.c_str(), seq_id_prev_+1, feedback->seq_id());
+            logger->info("    WARNING: Packet sequence duplicate detected (prev: %v, new: %v)", seq_id_prev_, feedback->seq_id());
+            return;
+        }
+        else if(seq_diff > 1)
+        {
+            // Missed packet(s). Not unusual, so don't need to print or log
+            seq_id_prev_ = feedback->seq_id();
+        }
+        else
+        {
+            // No issues
+            seq_id_prev_ = feedback->seq_id();
+        }
+        // Battery level
+        battery_lvl = feedback->agent_status_data().battery_level();
         //IMU
         sensor_msgs::Imu imu_msg;
         
@@ -225,6 +252,9 @@ private:
     el::Logger* logger; 
     std::string rid;
     OdomNode odom_node_;
+    int message_counter;
+    int battery_lvl;
+    int32_t seq_id_prev_;
 };
 
 #endif
