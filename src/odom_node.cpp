@@ -6,6 +6,7 @@
 #include <geometry_msgs/PoseStamped.h>
 
 using namespace std;
+#define EPSILON 10e-5
 
 // Constructor
 OdomNode::OdomNode(const std::string robot_id, ros::Publisher &odom_data_pub_euler, ros::Publisher &odom_data_pub_quat):
@@ -75,11 +76,11 @@ void OdomNode::update_odom()
   }
 
   // Make sure theta stays in the correct range
-  if (odomNew_.pose.pose.orientation.z > PI)
+  if (odomNew_.pose.pose.orientation.z + EPSILON > PI)
   {
     odomNew_.pose.pose.orientation.z -= 2 * PI;
   }
-  else if (odomNew_.pose.pose.orientation.z < -PI)
+  else if (odomNew_.pose.pose.orientation.z < -PI + EPSILON)
   {
     odomNew_.pose.pose.orientation.z += 2 * PI;
   }
