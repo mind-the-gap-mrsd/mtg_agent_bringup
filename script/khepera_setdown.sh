@@ -4,5 +4,5 @@
 KHEPERA_IP_ADDRESS=$1
 
 # Kill any old running code
-ssh root@${KHEPERA_IP_ADDRESS} pkill template
-ssh root@${KHEPERA_IP_ADDRESS} pkill template_perception
+ssh root@${KHEPERA_IP_ADDRESS} pkill -9 template
+ssh root@${KHEPERA_IP_ADDRESS} pkill -9 template_perception

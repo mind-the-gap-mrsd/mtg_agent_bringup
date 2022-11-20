@@ -165,12 +165,22 @@ public:
         lrf_msg.range_min = 0.019999999552965164;
         lrf_msg.range_max = 5.599999904632568;
         robosar_fms::LaserScanner lrf_feedback = feedback->lrf_data();
+        uint64_t laser_scan_max = -INT64_MAX, laser_scan_min = INT64_MAX;
         //ROS_INFO("Lrf data size : %d\n",lrf_feedback.values_size());
         for(int i=0;i<lrf_feedback.values_size();i++)
         {
+            if(lrf_feedback.values(i)>laser_scan_max){
+                laser_scan_max = lrf_feedback.values(i);
+            }
+            if(lrf_feedback.values(i)<laser_scan_min){
+                laser_scan_min = lrf_feedback.values(i);
+            }
             // mm to metres
             lrf_msg.ranges.push_back((float)(lrf_feedback.values(i))/1000.0f);
         }
+        logger->info("Laser Scan Max: %v", laser_scan_max);
+        logger->info("laser Scan Min: %v", laser_scan_min);
+        logger->info("Laser Scan Size: %v", lrf_feedback.values_size());
 
         message_counter++;
         lrf_publisher_.publish(lrf_msg);
