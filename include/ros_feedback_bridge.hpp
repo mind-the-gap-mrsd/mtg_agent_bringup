@@ -84,8 +84,15 @@ public:
         if(seq_diff < 0)
         {
             // Gone backwards; out of order. Log, report, discard.
+            // If difference is huge, then due to restart; update prev id
             ROS_WARN("[unpack_feedback_message] Packets out of order for %s; expected sequence ID %d, got %u. Ignoring.", rid.c_str(), seq_id_prev_+1, feedback->seq_id());
             logger->info("    WARNING: Packets out of order detected (prev: %v, new: %v)", seq_id_prev_, feedback->seq_id());
+            if(seq_diff < -100)
+            {
+              seq_id_prev_ = feedback->seq_id();
+              ROS_WARN("[unpack_feedback_message] Packet ID difference is too large for %s (%d); updating local ID to %u", rid.c_str(), seq_diff, feedback->seq_id());
+              logger->info("    INFO: Difference in ID too large; updating local ID to %v", feedback->seq_id());
+            }
             return;
         }
         else if(seq_diff == 0)
