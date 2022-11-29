@@ -11,7 +11,7 @@
                 "feedback_port" : 2109,
                 "control_port" : 2000,
                 "feedback_freq_hz" : 10,
-                "control_timeout_ms": 1000,
+                "control_timeout_ms": 500,
                 "deadman_timer_s": 5.0,
                 "freq_calculation_duration": 5,
                 "camera_enabled": false
