@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "robosar_agent_bringup_node");
+  ros::init(argc, argv, "mtg_agent_bringup_node");
 
   //move_base::MoveBase move_base( buffer );
 

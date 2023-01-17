@@ -7,7 +7,7 @@
 #include <ros/package.h>
 #include "boost/bind.hpp"
 #include <boost/thread.hpp>
-#include <robosar_messages/agents_status.h>
+#include <mtg_messages/agents_status.h>
 RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address, const std::string server_ip_addr,
                        const std::string path_to_code, const std::string path_to_perception_code, const int feedback_port, const int control_port, 
                        const int feedback_freq, const int control_timeout, const double deadman_timer_duration, const int freq_calculation_dur, const bool camera_enabled) :
@@ -37,7 +37,7 @@ RobotAgent::RobotAgent(const std::string robot_id, const std::string ip_address,
     }
 
     // Get path to config file
-    package_path = ros::package::getPath("robosar_agent_bringup");
+    package_path = ros::package::getPath("mtg_agent_bringup");
     std::string shell = package_path + "/script/khepera_setup.sh";
     // Run setup script
     std::system(&(shell + " " + path_to_code_ + " " + ip_address_ + " " + server_ip_addr_ +

@@ -7,7 +7,7 @@
 #include <string>
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
-#include "robosar.pb.h"
+#include "mtg.pb.h"
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
@@ -18,7 +18,7 @@
 #include <mutex>
 #include "easylogging++.h"
 #include <ros/package.h>
-#include <robosar_messages/agents_status.h>
+#include <mtg_messages/agents_status.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 class ROSFeedbackBridge
@@ -40,7 +40,7 @@ public:
         odom_delay_ms = (int)((1.0/(double)(odom_freq_hz))*1000.0);
         odom_thread_ = std::thread(&ROSFeedbackBridge::runOdometry, this);
 
-        std::string package_path = ros::package::getPath("robosar_agent_bringup");
+        std::string package_path = ros::package::getPath("mtg_agent_bringup");
 
         // Create log file for this agent
         el::Configurations agentLogConf;
@@ -76,7 +76,7 @@ public:
         el::Loggers::unregisterLogger(rid);
     }
 
-    void unpack_feedback_message(robosar_fms::SensorData* feedback) {
+    void unpack_feedback_message(mtg_fms::SensorData* feedback) {
 
         ROS_DEBUG("Unpacking message");
         // Sequence ID
@@ -164,7 +164,7 @@ public:
         lrf_msg.scan_time = 0.10000000149011612;
         lrf_msg.range_min = 0.019999999552965164;
         lrf_msg.range_max = 5.599999904632568;
-        robosar_fms::LaserScanner lrf_feedback = feedback->lrf_data();
+        mtg_fms::LaserScanner lrf_feedback = feedback->lrf_data();
         uint64_t laser_scan_max = -INT64_MAX, laser_scan_min = INT64_MAX;
         //ROS_INFO("Lrf data size : %d\n",lrf_feedback.values_size());
         for(int i=0;i<lrf_feedback.values_size();i++)
@@ -186,14 +186,14 @@ public:
         lrf_publisher_.publish(lrf_msg);
 
         // Apriltag detections
-        robosar_fms::AllDetections apriltag_feedback = feedback->april_detections();
+        mtg_fms::AllDetections apriltag_feedback = feedback->april_detections();
         apriltag_ros::AprilTagDetectionArray tag_msg;
         tag_msg.header.frame_id = khepera_frame;
         tag_msg.header.stamp = ros::Time::now();
         tag_msg.header.seq = feedback->seq_id();
 
         for(int i=0;i<apriltag_feedback.tag_detections_size();i++) {
-            robosar_fms::AprilTagDetection tag = apriltag_feedback.tag_detections(i);
+            mtg_fms::AprilTagDetection tag = apriltag_feedback.tag_detections(i);
 
             logger->info("Apriltag id %v w translation %v %v %v and rotation mat %v %v %v | %v %v %v | %v %v %v",
                             tag.tag_id(), tag.pose().t().x(),tag.pose().t().y(),tag.pose().t().z(), \

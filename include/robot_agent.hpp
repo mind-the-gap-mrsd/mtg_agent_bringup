@@ -12,7 +12,7 @@
 #include "ros_feedback_bridge.hpp"
 #include "odom_tf.hpp"
 #include "robot_status.hpp"
-#include <robosar_messages/agents_status.h>
+#include <mtg_messages/agents_status.h>
 class RobotAgent
 {
 
@@ -42,7 +42,7 @@ public:
     const int feedback_freq_hz_;
     const int control_timeout_ms_;
     const int freq_calculation_dur_;
-    robosar_messages::agents_status agent_status_;
+    mtg_messages::agents_status agent_status_;
 
 private:
     boost::asio::io_service io_service;

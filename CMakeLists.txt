@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(robosar_agent_bringup)
+project(mtg_agent_bringup)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -14,8 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   roslib
-  robosar_messages
-  robosar_tf
+  mtg_messages
+  mtg_tf
   angles
   apriltag_ros
   tf2
@@ -113,7 +113,7 @@ find_package(Protobuf REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES robosar_agent_bringup 
+  LIBRARIES mtg_agent_bringup 
   CATKIN_DEPENDS roscpp rospy std_msgs roslib
 #  DEPENDS system_lib
 )
@@ -126,13 +126,13 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  include/robosar_agent_bringup
+  include/mtg_agent_bringup
   ${catkin_INCLUDE_DIRS}
   ${jsoncpp_INCLUDE_DIRS}
   /usr/include/jsoncpp
-  ${robosar_messages_INCLUDE_DIRS}
+  ${mtg_messages_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${robosar_tf_INCLUDE_DIRS}
+  ${mtg_tf_INCLUDE_DIRS}
   third_party/easyloggingpp/src
 )
 
@@ -168,7 +168,7 @@ add_library(easy_logging
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/robosar_agent_bringup_node.cpp)
+add_executable(${PROJECT_NAME}_node src/mtg_agent_bringup_node.cpp)
 add_executable(odom_test test/odom_test.cpp)
 
 target_link_libraries(odom_test ${PROJECT_NAME})
@@ -238,7 +238,7 @@ install(TARGETS ${PROJECT_NAME}_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_robosar_agent_bringup.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mtg_agent_bringup.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

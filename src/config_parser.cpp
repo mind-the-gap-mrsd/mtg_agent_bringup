@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include "robot_status.hpp"
 #include "easylogging++.h"
-#include "robosar_messages/agents_status.h"
+#include "mtg_messages/agents_status.h"
 
 bool ConfigParser::is_initialized_ = false;
 INITIALIZE_EASYLOGGINGPP
@@ -19,7 +19,7 @@ ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
 {
 
     // Get path to config file
-    std::string package_path = ros::package::getPath("robosar_agent_bringup");
+    std::string package_path = ros::package::getPath("mtg_agent_bringup");
     std::string config_file_path_ = package_path + "/config/user_config.json";
 
     ROS_INFO("Looking for config file in path %s", &config_file_path_[0]);
@@ -44,7 +44,7 @@ ConfigParser::ConfigParser() : nh("~"), simulation_flag(false)
 
     sh = nh.advertiseService("agent_status", &ConfigParser::pubAgentInfo, this);
     shOdom = nh.advertiseService("sys_odom_reset", &ConfigParser::resetAgentsOdom, this);
-    agent_status_pub_ = nh.advertise<robosar_messages::agents_status>("all_agent_status", 1);
+    agent_status_pub_ = nh.advertise<mtg_messages::agents_status>("all_agent_status", 1);
     if(!config["simulation"].asBool()){
     feedback_timer_ = nh.createTimer(ros::Duration(config["update_status_dur"].asInt()),boost::bind(&ConfigParser::publishAgentStatus, this, _1));
     }
@@ -125,7 +125,7 @@ void ConfigParser::configSystemInit(Json::Value config)
     ROS_INFO("Number of agents online : %ld/%d\n", agents_vec.size(), it);
 }
 
-bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, robosar_messages::agent_status::Response &res)
+bool ConfigParser::pubAgentInfo(mtg_messages::agent_status::Request  &req, mtg_messages::agent_status::Response &res)
 {
     std::vector<std::string> status;
     if(simulation_flag)
@@ -155,7 +155,7 @@ bool ConfigParser::pubAgentInfo(robosar_messages::agent_status::Request  &req, r
     }
 }
 
-bool ConfigParser::resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &req, robosar_messages::sys_odom_reset::Response &res)
+bool ConfigParser::resetAgentsOdom(mtg_messages::sys_odom_reset::Request  &req, mtg_messages::sys_odom_reset::Response &res)
 {
     // Reset odometry for each agent
     try
@@ -179,7 +179,7 @@ void ConfigParser::publishAgentStatus(const ros::TimerEvent& timer_event) {
     std::vector<int> all_battery_lvl;
     std::vector<int> all_feedback_freq;
     std::vector<std::string> all_status;
-    robosar_messages::agents_status all_agents_status;
+    mtg_messages::agents_status all_agents_status;
     for (auto agent : all_agents_vec) {
         all_robot_id.push_back(agent->robot_id_);
         all_ip.push_back(agent->ip_address_);

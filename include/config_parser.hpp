@@ -6,9 +6,9 @@
 #include <json/json.h>
 #include "robot_agent.hpp"
 #include <memory>
-#include "robosar_messages/agent_status.h"
-#include "robosar_messages/sys_odom_reset.h"
-#include "robosar_messages/agents_status.h"
+#include "mtg_messages/agent_status.h"
+#include "mtg_messages/sys_odom_reset.h"
+#include "mtg_messages/agents_status.h"
 class ConfigParser
 {
 
@@ -20,10 +20,10 @@ public:
     // Creating another vector as need to maintain all agents not just the ones alive
     std::vector<std::shared_ptr<RobotAgent>> all_agents_vec;
     void publishAgentStatus(const ros::TimerEvent& timer_event);
-    bool pubAgentInfo(robosar_messages::agent_status::Request  &req,
-                     robosar_messages::agent_status::Response &res); 
-    bool resetAgentsOdom(robosar_messages::sys_odom_reset::Request  &req,
-                     robosar_messages::sys_odom_reset::Response &res); 
+    bool pubAgentInfo(mtg_messages::agent_status::Request  &req,
+                     mtg_messages::agent_status::Response &res); 
+    bool resetAgentsOdom(mtg_messages::sys_odom_reset::Request  &req,
+                     mtg_messages::sys_odom_reset::Response &res); 
 
 private:
     static bool is_initialized_;

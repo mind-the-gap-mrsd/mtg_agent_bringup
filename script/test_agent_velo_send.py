@@ -13,7 +13,7 @@ start = time.time()
 
 def talker():
 	# Set up publisher
-	pub = rospy.Publisher('/robosar_agent_bringup_node/agent1/control', Twist, queue_size=10)
+	pub = rospy.Publisher('/mtg_agent_bringup_node/agent1/control', Twist, queue_size=10)
 	rospy.init_node('Central_Algo', anonymous=True)
 	
 	# Set publish rate

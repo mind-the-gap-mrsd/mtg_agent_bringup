@@ -16,7 +16,7 @@
 #include <vector>
 #include <boost/asio.hpp>
 #include <ros/console.h>
-#include "robosar.pb.h"
+#include "mtg.pb.h"
 #include "ros_feedback_bridge.hpp"
 #include "robot_status.hpp"
 #include <google/protobuf/arena.h>
@@ -37,7 +37,7 @@ public:
 
     remote_endpoint_.address(IP);
     remote_endpoint_.port(remote_port);
-    feedback = google::protobuf::Arena::CreateMessage<robosar_fms::SensorData>(&arena_local);
+    feedback = google::protobuf::Arena::CreateMessage<mtg_fms::SensorData>(&arena_local);
     do_receive();
   }
 
@@ -103,7 +103,7 @@ private:
   udp::socket socket_;
   udp::endpoint remote_endpoint_;
   std::shared_ptr<ROSFeedbackBridge> bridgePtr_;
-  robosar_fms::SensorData* feedback;
+  mtg_fms::SensorData* feedback;
   google::protobuf::Arena arena_local;
   std::string rid_;
 };
