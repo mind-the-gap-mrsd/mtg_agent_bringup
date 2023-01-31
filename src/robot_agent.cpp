@@ -131,7 +131,7 @@ void RobotAgent::velocityCallback(const geometry_msgs::Twist &vel_msg)
  */
 void RobotAgent::timerCallback(const ros::TimerEvent& timer_event) {
     status_ptr_->setStatus(RobotStatus::ROBOT_STATUS_NO_HEARTBEAT);
-    ROS_WARN("%s: NO HEARTBEAT", &robot_id_[0]);
+    ROS_INFO("%s: NO HEARTBEAT", &robot_id_[0]);
     timer_ptr_->stop();
 }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+    <node name="joy_node" pkg="joy" type="joy_node" output="screen" />
+    <!-- Call agent bringup node -->
+    <param name="velocity_inc_button" value="0"> </param>
+    <param name="velocity_dec_button" value="3"> </param>
+    <param name="agent_change_button_right" value="5"> </param>
+    <param name="agent_change_button_left" value="4"> </param>
+    <node name="mtg_agent_bringup_teleop_node" pkg="mtg_agent_bringup" type="mtg_agent_bringup_teleop_node" output="screen"/>
+</launch>

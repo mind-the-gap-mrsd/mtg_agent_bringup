@@ -170,6 +170,7 @@ add_library(easy_logging
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/mtg_agent_bringup_node.cpp)
 add_executable(odom_test test/odom_test.cpp)
+add_executable(${PROJECT_NAME}_teleop_node src/teleop_node.cpp)
 
 target_link_libraries(odom_test ${PROJECT_NAME})
 
@@ -185,6 +186,13 @@ add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+   ${jsoncpp_LIBRARIES}
+   ${PROJECT_NAME}
+   jsoncpp
+ )
+
+ target_link_libraries(${PROJECT_NAME}_teleop_node
    ${catkin_LIBRARIES}
    ${jsoncpp_LIBRARIES}
    ${PROJECT_NAME}
