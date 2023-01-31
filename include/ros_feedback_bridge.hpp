@@ -10,6 +10,7 @@
 #include "mtg.pb.h"
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/Range.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
 #include <apriltag_ros/AprilTagDetection.h>
 #include <angles/angles.h>
@@ -35,6 +36,8 @@ public:
         imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("feedback/IMU", 1, true);
         lrf_publisher_ = nh_.advertise<sensor_msgs::LaserScan>("feedback/scan", 1, true);
         apriltag_publisher_ = nh_.advertise<apriltag_ros::AprilTagDetectionArray>("feedback/apriltag", 1, true);
+        us_publisher_ = nh_.advertise<sensor_msgs::Range>("feedback/us", 1, true);
+        ir_publisher_ = nh_.advertise<sensor_msgs::Range>("feedback/ir", 1, true);
 
         //// Start Odom node
         odom_delay_ms = (int)((1.0/(double)(odom_freq_hz))*1000.0);
@@ -114,6 +117,29 @@ public:
         }
         // Battery level
         battery_lvl = feedback->agent_status_data().battery_level();
+
+        // Ultrasonic Sensors
+        sensor_msgs::Range us_msg;
+        us_msg.header.frame_id = khepera_frame;
+        us_msg.header.seq = feedback->seq_id();
+        us_msg.header.stamp = ros::Time::now();
+
+        us_msg.radiation_type = 0;
+        us_msg.max_range = (float) 1e8;
+        us_msg.range = (float) feedback->us_data().sensor_c(); // this returns in [0,1000] lol, closest is 1000, inf is 0
+        us_publisher_.publish(us_msg);
+
+        // IR
+        sensor_msgs::Range ir_msg;
+        ir_msg.header.frame_id = khepera_frame;
+        ir_msg.header.seq = feedback->seq_id();
+        ir_msg.header.stamp = ros::Time::now();
+
+        ir_msg.radiation_type = 1;
+        ir_msg.max_range = (float) 1e8;
+        ir_msg.range = (float) feedback->ir_data().sensor_d(); // this returns in [0,1024] lol, closest is 1024, inf is 0
+        ir_publisher_.publish(ir_msg);
+
         //IMU
         sensor_msgs::Imu imu_msg;
         
@@ -129,7 +155,6 @@ public:
         imu_msg.angular_velocity.x = angles::from_degrees(feedback->gyro_data().gyro_x());
         imu_msg.angular_velocity.y = angles::from_degrees(feedback->gyro_data().gyro_y());
         imu_msg.angular_velocity.z = angles::from_degrees(feedback->gyro_data().gyro_z());
-        
         imu_publisher_.publish(imu_msg);
 
         logger->info("IMU seq :%v, accel_x :%v, accel_y :%v, accel_z :%v, ang_x :%v,  ang_y :%v,  ang_z :%v",imu_msg.header.seq,
@@ -272,6 +297,8 @@ private:
     ros::Publisher odom_data_pub_euler;
     ros::Publisher odom_data_pub_quat;
     ros::Publisher lrf_publisher_;
+    ros::Publisher ir_publisher_;
+    ros::Publisher us_publisher_;
     ros::Publisher apriltag_publisher_;
     std::string khepera_frame;
     std::thread odom_thread_;

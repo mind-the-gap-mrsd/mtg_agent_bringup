@@ -1,35 +1,15 @@
 {
     "config_selection": "config1",
-    "server_ip_address": "192.168.2.228",
-    "path_to_khepera_code": "/home/hari/mtg_ws/src/mtg_khepera_code/template",
+    "server_ip_address": "192.168.2.161",
+    "path_to_khepera_code": "/home/mtg/mtg_ws/src/mtg_khepera_code/template",
     "path_to_perception_code": "",
     "simulation" : false,
     "update_status_dur" : 10,
     "config1": {
             "agent_0": {
-                "ip_address" : "192.168.2.108",
+                "ip_address" : "192.168.2.117",
                 "feedback_port" : 2109,
                 "control_port" : 2000,
-                "feedback_freq_hz" : 10,
-                "control_timeout_ms": 500,
-                "deadman_timer_s": 5.0,
-                "freq_calculation_duration": 5,
-                "camera_enabled": false
-            },
-            "agent_1": {
-                "ip_address" : "192.168.2.111",
-                "feedback_port" : 2108,
-                "control_port" : 2001,
-                "feedback_freq_hz" : 10,
-                "control_timeout_ms": 500,
-                "deadman_timer_s": 5.0,
-                "freq_calculation_duration": 5,
-                "camera_enabled": false
-            },
-            "agent_2": {
-                "ip_address" : "192.168.2.117",
-                "feedback_port" : 2107,
-                "control_port" : 2002,
                 "feedback_freq_hz" : 10,
                 "control_timeout_ms": 500,
                 "deadman_timer_s": 5.0,

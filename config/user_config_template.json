@@ -1,0 +1,45 @@
+{
+    "_comment": "rename file to to user_config.json, remove this line; can add multiple configs in the same file",
+    "config_selection": "config1",
+    "server_ip_address": "local ip",
+    "path_to_khepera_code": "/path/to/mtg_khepera_code/template",
+    "path_to_perception_code": "/path/to/mtg_khepera_code/template-perception",
+    "simulation" : false,
+    "update_status_dur" : 10,
+    "config1": {
+            "agent_0": {
+                "_comment": "feedback and control ports MUST be unique for each robot in each config",
+                "ip_address" : "robot ip on the same network",
+                "feedback_port" : 2109,
+                "control_port" : 2000,
+                "feedback_freq_hz" : 10,
+                "control_timeout_ms": 500,
+                "deadman_timer_s": 5.0,
+                "freq_calculation_duration": 5,
+                "camera_enabled": false
+            },
+            "agent_1": {
+                "ip_address" : "192.168.2.111",
+                "feedback_port" : 2108,
+                "control_port" : 2001,
+                "feedback_freq_hz" : 10,
+                "control_timeout_ms": 500,
+                "deadman_timer_s": 5.0,
+                "freq_calculation_duration": 5,
+                "camera_enabled": false
+            }
+    },
+    "config2": {
+            "agent_1": {
+                "ip_address" : "192.168.2.111",
+                "feedback_port" : 2108,
+                "control_port" : 2001,
+                "feedback_freq_hz" : 10,
+                "control_timeout_ms": 500,
+                "deadman_timer_s": 5.0,
+                "freq_calculation_duration": 5,
+                "camera_enabled": false
+        }
+    }
+    
+}
